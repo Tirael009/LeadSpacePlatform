@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "email": "lender@test.com",
+    "password": "password123",
+    "firstName": "John",
+    "lastName": "Doe",
+    "type": "lender",
+    "company": "Lender Inc"
+  },
+  {
+    "id": 2,
+    "email": "publisher@test.com",
+    "password": "password123",
+    "firstName": "Jane",
+    "lastName": "Smith",
+    "type": "publisher",
+    "website": "news-site.com"
+  }
+]

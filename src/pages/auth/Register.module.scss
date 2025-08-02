@@ -1,0 +1,59 @@
+//Register.module.scss
+@use './Login.module.scss' as *; // Используем стили из Login
+
+.registerContainer {
+  @extend .loginContainer;
+}
+
+.registerCard {
+  @extend .loginCard;
+  max-width: 500px; // Немного шире для дополнительных полей
+}
+
+.registerHeader {
+  @extend .loginHeader;
+}
+
+.userTypeToggle {
+  @extend .userTypeToggle;
+}
+
+.registerForm {
+  @extend .loginForm;
+  gap: 16px;
+}
+
+.inputGroup {
+  @extend .inputGroup;
+}
+
+.passwordWrapper {
+  @extend .passwordWrapper;
+}
+
+.rememberForgot {
+  @extend .rememberForgot;
+}
+
+.registerButton {
+  @extend .loginButton;
+}
+
+.errorMessage {
+  @extend .errorMessage;
+}
+
+.loginPrompt {
+  @extend .signupPrompt;
+}
+
+// Дополнительные стили для двухколоночного расположения
+.twoColumns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
+}

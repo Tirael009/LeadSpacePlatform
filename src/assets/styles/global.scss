@@ -1,0 +1,145 @@
+@import './variables';
+@import './mixins';
+
+// Базовые сбросы и настройки
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: $font-main;
+  color: #E2E8F0;
+  background-color: $space-dark;
+  line-height: 1.6;
+  @include starfield-bg(200, 0.5);
+  min-height: 100vh;
+}
+
+// Типографика
+h1, h2, h3, h4, h5, h6 {
+  font-family: $font-heading;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: $spacing-unit;
+  @include neon-text($neon-blue);
+}
+
+h1 { font-size: $text-3xl; }
+h2 { font-size: $text-2xl; }
+h3 { font-size: $text-xl; }
+h4 { font-size: $text-lg; }
+
+p {
+  margin-bottom: $spacing-unit;
+  font-size: $text-base;
+}
+
+a {
+  color: $neon-blue;
+  text-decoration: none;
+  transition: color $transition-fast;
+
+  &:hover {
+    color: $neon-purple;
+    text-decoration: underline;
+  }
+}
+
+// Кнопки
+button {
+  cursor: pointer;
+  transition: all $transition-normal;
+}
+
+.btn {
+  @include neon-button($neon-gradient);
+  
+  &--danger {
+    @include neon-button($danger-gradient);
+  }
+  
+  &--outline {
+    background: transparent;
+    border: 1px solid $neon-blue;
+    box-shadow: $glow-blue;
+    
+    &:hover {
+      background: rgba($neon-blue, 0.1);
+    }
+  }
+}
+
+// Формы
+input, textarea, select {
+  background: rgba($space-dark, 0.8);
+  border: 1px solid rgba($neon-blue, 0.3);
+  border-radius: $border-radius-sm;
+  padding: 0.75rem;
+  color: #E2E8F0;
+  font-family: $font-main;
+  transition: all $transition-normal;
+  
+  &:focus {
+    outline: none;
+    border-color: $neon-blue;
+    box-shadow: 0 0 0 2px rgba($neon-blue, 0.2);
+  }
+}
+
+// Утилитарные классы
+.container {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 $spacing-unit * 2;
+}
+
+.text-center { text-align: center; }
+.text-uppercase { text-transform: uppercase; }
+.text-mono { font-family: $font-mono; }
+
+.glow-blue { @include neon-text($neon-blue); }
+.glow-purple { @include neon-text($neon-purple); }
+
+// Анимации
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.float-animation {
+  animation: float 3s ease-in-out infinite;
+}
+
+// Эффекты для космической темы
+.space-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba($neon-blue, 0.4), transparent);
+  margin: $spacing-unit * 2 0;
+}
+
+// Адаптивные медиа-запросы
+@media (max-width: $breakpoint-lg) {
+  html { font-size: 15px; }
+}
+
+@media (max-width: $breakpoint-md) {
+  html { font-size: 14px; }
+  
+  .container {
+    padding: 0 $spacing-unit;
+  }
+}
+
+@media (max-width: $breakpoint-sm) {
+  html { font-size: 13px; }
+}

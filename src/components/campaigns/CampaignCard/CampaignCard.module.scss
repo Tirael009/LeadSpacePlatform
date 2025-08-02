@@ -1,0 +1,203 @@
+@import '../../../assets/styles/variables.scss';
+
+.card {
+  background: rgba(15, 23, 42, 0.7);
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 0 20px rgba(0, 245, 255, 0.1);
+  border: 1px solid rgba(98, 154, 219, 0.1);
+  backdrop-filter: blur(5px);
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  &.active {
+    border-left: 4px solid #26DE81;
+  }
+
+  &.paused {
+    border-left: 4px solid #FED330;
+  }
+
+  &.archived {
+    border-left: 4px solid #A0AEC0;
+  }
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0 30px rgba(0, 245, 255, 0.2);
+  }
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+
+  h3 {
+    margin: 0;
+    color: #E2E8F0;
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+}
+
+.status {
+  display: inline-block;
+  padding: 0.3rem 0.8rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-family: 'Orbitron', sans-serif;
+
+  &.active {
+    background: rgba(38, 222, 129, 0.2);
+    color: #26DE81;
+    box-shadow: 0 0 8px rgba(38, 222, 129, 0.3);
+  }
+
+  &.paused {
+    background: rgba(254, 211, 48, 0.2);
+    color: #FED330;
+    box-shadow: 0 0 8px rgba(254, 211, 48, 0.3);
+  }
+
+  &.archived {
+    background: rgba(160, 174, 192, 0.2);
+    color: #A0AEC0;
+    box-shadow: 0 0 8px rgba(160, 174, 192, 0.3);
+  }
+}
+
+.cardBody {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.metricRow {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.metric {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .metricLabel {
+    color: #A0AEC0;
+    font-size: 0.8rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .metricValue {
+    color: #E2E8F0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    font-family: 'Orbitron', sans-serif;
+  }
+}
+
+.revenueRow {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  background: rgba(0, 245, 255, 0.05);
+  padding: 1rem;
+  border-radius: 6px;
+  border: 1px dashed rgba(0, 245, 255, 0.2);
+}
+
+.revenue {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .revenueLabel {
+    color: #A0AEC0;
+    font-size: 0.8rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .revenueValue {
+    color: #00F5FF;
+    font-size: 1.2rem;
+    font-weight: 600;
+    font-family: 'Orbitron', sans-serif;
+  }
+}
+
+.dates {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: #A0AEC0;
+}
+
+.cardFooter {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+
+  button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+    font-family: 'Orbitron', sans-serif;
+    letter-spacing: 1px;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 10px rgba(0, 245, 255, 0.3);
+    }
+  }
+}
+
+.pauseButton {
+  background: rgba(254, 211, 48, 0.2);
+  color: #FED330;
+
+  &:hover {
+    background: rgba(254, 211, 48, 0.3);
+  }
+}
+
+.playButton {
+  background: rgba(38, 222, 129, 0.2);
+  color: #26DE81;
+
+  &:hover {
+    background: rgba(38, 222, 129, 0.3);
+  }
+}
+
+.editButton {
+  background: rgba(0, 245, 255, 0.2);
+  color: #00F5FF;
+
+  &:hover {
+    background: rgba(0, 245, 255, 0.3);
+  }
+}
+
+.archiveButton {
+  background: rgba(160, 174, 192, 0.2);
+  color: #A0AEC0;
+
+  &:hover {
+    background: rgba(160, 174, 192, 0.3);
+  }
+}

@@ -1,0 +1,68 @@
+// src/components/ui/StatsCard.module.scss
+.card {
+  background-color: white;
+  border-radius: 10px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
+}
+
+.iconContainer {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: #ebf8ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1.25rem;
+  color: #3182ce;
+}
+
+.icon {
+  font-size: 1.25rem;
+}
+
+.content {
+  flex: 1;
+}
+
+.title {
+  margin: 0 0 0.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #718096;
+}
+
+.value {
+  margin: 0 0 0.25rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.change {
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+
+  &.positive {
+    color: #38a169;
+  }
+
+  &.negative {
+    color: #e53e3e;
+  }
+}
+
+.changeText {
+  color: #a0aec0;
+  margin-left: 0.25rem;
+}

@@ -1,0 +1,165 @@
+// ResourceUsage.module.scss
+@import '../../../assets/styles/variables.scss';
+@import '../../../assets/styles/mixins.scss';
+
+.resourceUsage {
+  background: rgba(15, 23, 42, 0.7);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-top: 2rem;
+  box-shadow: 0 0 15px rgba(0, 245, 255, 0.1);
+  border: 1px solid rgba(98, 154, 219, 0.1);
+  backdrop-filter: blur(5px);
+
+  .title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.1rem;
+    color: #00F5FF;
+    text-shadow: 0 0 8px rgba(0, 245, 255, 0.3);
+    margin: 0 0 1.5rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    letter-spacing: 0.5px;
+
+    .titleIcon {
+      color: #9D00FF;
+      font-size: 1.2rem;
+    }
+  }
+
+  .resourceItem {
+    margin-bottom: 1.25rem;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .resourceHeader {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .resourceIcon {
+    color: #00F5FF;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+
+  .resourceName {
+    color: #E2E8F0;
+    font-size: 0.9rem;
+    font-weight: 500;
+    flex-grow: 1;
+  }
+
+  .resourceCount {
+    color: #A0AEC0;
+    font-size: 0.85rem;
+    font-family: 'Roboto Mono', monospace;
+  }
+
+  .progressBar {
+    height: 8px;
+    background: rgba(15, 23, 42, 0.9);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+  }
+
+  .progressFill {
+    height: 100%;
+    border-radius: 4px;
+    position: relative;
+    transition: width 0.5s ease, background 0.3s ease;
+    box-shadow: 0 0 10px currentColor;
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.3) 50%,
+        rgba(255, 255, 255, 0) 100%
+      );
+      animation: progressShine 2s infinite;
+    }
+  }
+
+  .progressText {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
+  }
+
+  .usageHint {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px dashed rgba(98, 154, 219, 0.3);
+    text-align: center;
+
+    p {
+      color: #A0AEC0;
+      font-size: 0.85rem;
+      margin: 0;
+      font-style: italic;
+
+      &::before {
+        content: 'ⓘ ';
+        color: #00F5FF;
+      }
+    }
+  }
+}
+
+@keyframes progressShine {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+// Адаптивные стили
+@media (max-width: 768px) {
+  .resourceUsage {
+    padding: 1.25rem;
+    margin-top: 1.5rem;
+
+    .title {
+      font-size: 1rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .resourceHeader {
+      gap: 0.5rem;
+    }
+
+    .resourceIcon {
+      font-size: 1rem;
+    }
+
+    .resourceName {
+      font-size: 0.85rem;
+    }
+
+    .resourceCount {
+      font-size: 0.8rem;
+    }
+  }
+}
