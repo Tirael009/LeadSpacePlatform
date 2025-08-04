@@ -3,7 +3,7 @@ import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FaUserShield, FaKey, FaEye, FaEyeSlash } from 'react-icons/fa';
 import styles from './Login.module.scss';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '@/hooks/useAuth';
 
 const LoginPage = () => {
   const navigate = useNavigate();

@@ -1,26 +1,23 @@
-import { Directus } from '@directus/sdk';
+// src/api/directus.ts
 
-type Collections = {
-  leads: Lead;
-  users: User;
-  // ... другие коллекции
-};
+import { createDirectus, rest, authentication } from '@directus/sdk';
+import type { Schema } from '../types/Schema';
 
-export const directus = new Directus<Collections>(
-  import.meta.env.VITE_DIRECTUS_URL,
-  {
-    auth: {
-      mode: 'cookie', // Для безопасного хранения токена
-    },
-  }
-);
+const directus = createDirectus<Schema>(import.meta.env.VITE_DIRECTUS_URL)
+  .with(rest())
+  .with(authentication());
 
-// Обёртка для обработки ошибок
-export const safeRequest = async <T>(promise: Promise<T>) => {
+// Авторизация через e-mail и пароль (можно вызвать в useEffect или вручную при логине)
+export const loginToDirectus = async () => {
   try {
-    return await promise;
+    await directus.login({
+      email: import.meta.env.VITE_DIRECTUS_EMAIL,
+      password: import.meta.env.VITE_DIRECTUS_PASSWORD,
+    });
+    console.log('🟢 Logged in to Directus successfully');
   } catch (error) {
-    console.error('API Error:', error);
-    throw error;
+    console.error('🔴 Directus login failed:', error);
   }
 };
+
+export { directus };

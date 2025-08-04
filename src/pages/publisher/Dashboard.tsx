@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../hooks/useAuth';
 import { 
   FiTrendingUp, 
   FiDollarSign, 
   FiPieChart,
-  FiSettings,
   FiBell,
   FiHelpCircle,
   FiPlus,
@@ -51,7 +50,7 @@ interface Notification {
 }
 
 const PublisherDashboard = () => {
-  const { user, logout } = useAuth();
+  const { user} = useAuth();
   const [activeTab, setActiveTab] = useState<'dashboard' | 'campaigns' | 'traffic' | 'earnings'>('dashboard');
   const [filter, setFilter] = useState({
     status: '',
@@ -293,12 +292,12 @@ const PublisherDashboard = () => {
           </ul>
         </div>
 
-        <ResourceUsage 
-          campaignsUsed={campaigns.length} 
-          campaignsLimit={50} 
-          trafficUsed={85} 
-          trafficLimit={100}
-        />
+          <ResourceUsage 
+            leadsUsed={campaigns.length} 
+            leadsLimit={50} 
+            storageUsed={85} 
+            storageLimit={100}
+          />
       </aside>
 
       {/* Main Content Area */}

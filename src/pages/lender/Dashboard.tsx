@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../hooks/useAuth';
+import { readItems } from '@directus/sdk';
+import { directus } from "../../api/directus";
 import { 
   FiUsers, 
   FiTrendingUp, 
@@ -51,15 +53,22 @@ interface Notification {
   read: boolean;
 }
 
-interface Activity {
-  id: string;
-  action: string;
-  user: string;
-  time: string;
+interface Stats {
+  totalLeads: number;
+  leadsChange: number;
+  conversionRate: number;
+  conversionChange: number;
+  revenue: number;
+  revenueChange: number;
+  totalPaid: number;
+  pendingAmount: number;
+  recentPayments: Payment[];
+  topSources: Array<{ name: string; count: number }>;
+  teamPerformance: Array<{ name: string; conversion: number }>;
 }
 
 const LenderDashboard = () => {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<'leads' | 'analytics' | 'payments' | 'settings'>('leads');
   const [filter, setFilter] = useState({
     status: '',
@@ -68,7 +77,7 @@ const LenderDashboard = () => {
     source: ''
   });
   const [leads, setLeads] = useState<Lead[]>([]);
-  const [stats, setStats] = useState({
+  const [stats, setStats] = useState<Stats>({
     totalLeads: 0,
     leadsChange: 0,
     conversionRate: 0,
@@ -77,51 +86,41 @@ const LenderDashboard = () => {
     revenueChange: 0,
     totalPaid: 0,
     pendingAmount: 0,
-    recentPayments: [] as Payment[],
-    topSources: [] as Array<{ name: string; count: number }>,
-    teamPerformance: [] as Array<{ name: string; conversion: number }>
+    recentPayments: [],
+    topSources: [],
+    teamPerformance: []
   });
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [notificationPanelOpen, setNotificationPanelOpen] = useState(false);
 
-  // Mock data initialization
   useEffect(() => {
+    // Переносим моки внутрь useEffect, чтобы избежать ошибки зависимостей
     const mockLeads: Lead[] = [
-      { 
-        id: '1', 
-        name: 'John Doe', 
-        email: 'john@example.com', 
-        phone: '+1 234 567 890', 
-        status: 'new', 
-        source: 'Organic', 
-        date: '2023-05-15', 
-        value: 500 
+      {
+        id: '1',
+        name: 'John Doe',
+        email: 'john@example.com',
+        phone: '+1234567890',
+        status: 'new',
+        source: 'Google Ads',
+        date: '2023-05-15',
+        value: 100
       },
-      { 
-        id: '2', 
-        name: 'Jane Smith', 
-        email: 'jane@example.com', 
-        phone: '+1 345 678 901', 
-        status: 'contacted', 
-        source: 'Facebook', 
-        date: '2023-05-14', 
-        value: 750 
-      },
-      { 
-        id: '3', 
-        name: 'Robert Johnson', 
-        email: 'robert@example.com', 
-        phone: '+1 456 789 012', 
-        status: 'converted', 
-        source: 'Google Ads', 
-        date: '2023-05-10', 
-        value: 1000 
-      },
+      {
+        id: '2',
+        name: 'Jane Smith',
+        email: 'jane@example.com',
+        phone: '+1987654321',
+        status: 'contacted',
+        source: 'Facebook',
+        date: '2023-05-10',
+        value: 150
+      }
     ];
 
-    const mockStats = {
+    const mockStats: Stats = {
       totalLeads: 128,
       leadsChange: 12,
       conversionRate: 32,
@@ -184,13 +183,24 @@ const LenderDashboard = () => {
       }
     ];
 
-    setLeads(mockLeads);
-    setStats(mockStats);
-    setNotifications(mockNotifications);
-    setUnreadCount(mockNotifications.filter(n => !n.read).length);
+    const fetchLeads = async () => {
+      try {
+        const response = await directus.request<Lead[]>(readItems('leads'));
+        setLeads(response);
+      } catch (error) {
+        console.error('Error loading leads:', error);
+        // Используем моки при ошибке загрузки
+        setLeads(mockLeads);
+        setStats(mockStats);
+        setNotifications(mockNotifications);
+        setUnreadCount(mockNotifications.filter(n => !n.read).length);
+      }
+    };
+
+    fetchLeads();
   }, []);
 
-  const filteredLeads = leads.filter(lead => {
+  const filteredLeads = leads.filter((lead: Lead) => {
     const matchesStatus = !filter.status || lead.status === filter.status;
     const matchesSearch = !filter.searchQuery || 
       lead.name.toLowerCase().includes(filter.searchQuery.toLowerCase()) ||
@@ -373,25 +383,25 @@ const LenderDashboard = () => {
                   title="Total Leads" 
                   value={stats.totalLeads} 
                   change={stats.leadsChange} 
-                  icon={<FiUsers />}
+                  icon="users"
                 />
                 <StatsCard 
                   title="Conversion Rate" 
                   value={`${stats.conversionRate}%`} 
                   change={stats.conversionChange} 
-                  icon={<FiTrendingUp />}
+                  icon="users"
                 />
                 <StatsCard 
                   title="Revenue" 
                   value={`$${stats.revenue.toLocaleString()}`} 
                   change={stats.revenueChange} 
-                  icon={<FiDollarSign />}
+                  icon="users"
                 />
                 <StatsCard 
                   title="Avg Lead Value" 
                   value={`$${Math.round(stats.revenue / stats.totalLeads)}`} 
                   change={5} 
-                  icon={<FiCreditCard />}
+                  icon="users"
                 />
               </section>
 
@@ -442,13 +452,13 @@ const LenderDashboard = () => {
                   title="Top Source" 
                   value={stats.topSources[0]?.name || 'N/A'} 
                   change={0} 
-                  icon={<FiTrendingUp />}
+                  icon="users"
                 />
                 <StatsCard 
                   title="Best Team" 
                   value={stats.teamPerformance[0]?.name || 'N/A'} 
                   change={0} 
-                  icon={<FiUsers />}
+                  icon="users"
                 />
                 <StatsCard 
                   title="Avg Conversion" 
@@ -456,7 +466,7 @@ const LenderDashboard = () => {
                     stats.teamPerformance.reduce((acc, curr) => acc + curr.conversion, 0) / stats.teamPerformance.length
                   )}%`} 
                   change={stats.conversionChange} 
-                  icon={<FiPieChart />}
+                  icon="users"
                 />
               </section>
 
@@ -507,17 +517,20 @@ const LenderDashboard = () => {
                 <StatsCard 
                   title="Total Paid" 
                   value={`$${stats.totalPaid.toLocaleString()}`} 
-                  icon={<FiDollarSign />}
+                  change={0} // Добавляем пропс change
+                  icon="money" // Используем строковый идентификатор
                 />
                 <StatsCard 
                   title="Pending" 
                   value={`$${stats.pendingAmount.toLocaleString()}`} 
-                  icon={<FiCreditCard />}
+                  change={0} // Добавляем пропс change
+                  icon="money" // Используем строковый идентификатор
                 />
                 <StatsCard 
                   title="Next Payout" 
                   value={stats.recentPayments.find(p => p.status === 'pending')?.date || 'N/A'} 
-                  icon={<FiFileText />}
+                  change={0} // Добавляем пропс change
+                  icon="chart" // Используем строковый идентификатор
                 />
               </section>
               

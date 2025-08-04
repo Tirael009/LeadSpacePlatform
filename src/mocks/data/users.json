@@ -5,7 +5,7 @@
     "password": "password123",
     "firstName": "John",
     "lastName": "Doe",
-    "type": "lender",
+    "role": "lender",
     "company": "Lender Inc"
   },
   {
@@ -14,7 +14,7 @@
     "password": "password123",
     "firstName": "Jane",
     "lastName": "Smith",
-    "type": "publisher",
+    "role": "publisher",
     "website": "news-site.com"
   }
 ]

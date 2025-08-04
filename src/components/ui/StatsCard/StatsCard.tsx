@@ -1,29 +1,21 @@
-//StatsCard.tsx
-// src/components/ui/StatsCard.tsx
 import React from 'react';
-import { FaUsers, FaChartLine, FaMoneyBillWave } from 'react-icons/fa';
+import { FaUsers } from 'react-icons/fa';
 import styles from './StatsCard.module.scss';
 
 interface StatsCardProps {
   title: string;
   value: string | number;
   change: number;
-  icon?: 'users' | 'chart' | 'money';
+  icon?: React.ReactNode;
 }
 
-const iconMap = {
-  users: <FaUsers className={styles.icon} />,
-  chart: <FaChartLine className={styles.icon} />,
-  money: <FaMoneyBillWave className={styles.icon} />,
-};
-
-const StatsCard: React.FC<StatsCardProps> = ({ title, value, change, icon = 'users' }) => {
+const StatsCard: React.FC<StatsCardProps> = ({ title, value, change, icon }) => {
   const isPositive = change >= 0;
 
   return (
     <div className={styles.card}>
       <div className={styles.iconContainer}>
-        {iconMap[icon]}
+        {icon || <FaUsers className={styles.icon} />}
       </div>
       <div className={styles.content}>
         <h3 className={styles.title}>{title}</h3>

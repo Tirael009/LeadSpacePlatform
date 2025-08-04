@@ -56,7 +56,7 @@ const RegisterPage = () => {
     if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = 'Passwords do not match';
     if (!acceptTerms) newErrors.terms = 'You must accept the terms';
     
-    if (userType === 'company' && !formData.company) {
+    if (userType === 'lender' && !formData.company) {
       newErrors.company = 'Company name is required';
     }
     
