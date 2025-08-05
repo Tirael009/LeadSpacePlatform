@@ -6,6 +6,7 @@
     "firstName": "John",
     "lastName": "Doe",
     "role": "lender",
+    "type": "lender", 
     "company": "Lender Inc"
   },
   {
@@ -15,6 +16,7 @@
     "firstName": "Jane",
     "lastName": "Smith",
     "role": "publisher",
+    "type": "publisher",
     "website": "news-site.com"
   }
 ]

@@ -22,14 +22,12 @@ export interface User {
   id: number;
   email: string;
   password: string;
+  firstName: string;
+  lastName: string;
   role: UserRole;
-  type: 'lender' | 'publisher';
-  firstName?: string;
-  lastName?: string;
+  type: 'lender' | 'publisher'; // Важно: именно так должно быть определено
   company?: string;
   website?: string;
-  avatar?: string;
-  phone?: string;
 }
 
 export interface AuthContextType {
