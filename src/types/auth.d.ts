@@ -28,6 +28,8 @@ export interface User {
   type: 'lender' | 'publisher'; // Важно: именно так должно быть определено
   company?: string;
   website?: string;
+  avatar?: string;
+  phone?: string;
 }
 
 export interface AuthContextType {
