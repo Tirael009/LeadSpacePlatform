@@ -1,0 +1,42 @@
+@import '../../assets/styles/variables';
+
+.layoutContainer {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: 
+    radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%),
+    url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%"><circle cx="10%" cy="20%" r="1" fill="white" opacity="0.7"/><circle cx="30%" cy="50%" r="1.5" fill="white" opacity="0.5"/></svg>');
+  color: #E2E8F0;
+  font-family: 'Montserrat', sans-serif;
+  position: relative;
+  overflow-x: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0, 245, 255, 0.4), transparent);
+    box-shadow: 0 0 10px rgba(0, 245, 255, 0.3);
+  }
+}
+
+.contentArea {
+  flex: 1;
+  padding: 2rem;
+  overflow-y: auto;
+  position: relative;
+  
+  @media (max-width: 768px) {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .mainContent {
+    position: relative;
+  }
+}

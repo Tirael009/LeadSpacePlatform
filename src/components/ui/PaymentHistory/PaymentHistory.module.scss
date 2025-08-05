@@ -1,0 +1,179 @@
+.paymentHistory {
+  background: rgba(15, 23, 42, 0.7);
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 0 15px rgba(0, 245, 255, 0.1);
+  border: 1px solid rgba(98, 154, 219, 0.1);
+  backdrop-filter: blur(5px);
+  overflow: hidden;
+  
+  .paymentsTable {
+    width: 100%;
+    border-collapse: collapse;
+    
+    th, td {
+      padding: 1rem;
+      text-align: left;
+      border-bottom: 1px solid rgba(98, 154, 219, 0.1);
+    }
+    
+    th {
+      font-weight: 600;
+      color: #00F5FF;
+      background: rgba(0, 245, 255, 0.05);
+      font-family: 'Orbitron', sans-serif;
+      letter-spacing: 1px;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      cursor: pointer;
+      user-select: none;
+      
+      &:hover {
+        background: rgba(0, 245, 255, 0.1);
+      }
+    }
+    
+    .sortableHeader {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    tr {
+      transition: background 0.2s ease;
+      
+      &.expandableRow {
+        cursor: pointer;
+        
+        &:hover {
+          background: rgba(98, 154, 219, 0.05);
+        }
+      }
+    }
+    
+    .detailsRow {
+      background: rgba(15, 23, 42, 0.9);
+      
+      td {
+        padding: 0;
+      }
+    }
+  }
+  
+  .status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    min-width: 100px;
+    justify-content: center;
+    
+    &.paid {
+      background: rgba(38, 222, 129, 0.1);
+      color: #26DE81;
+    }
+    
+    &.pending {
+      background: rgba(254, 211, 48, 0.1);
+      color: #FED330;
+    }
+    
+    &.failed {
+      background: rgba(255, 71, 87, 0.1);
+      color: #FF4757;
+    }
+  }
+  
+  .downloadButton {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: transparent;
+    border: 1px solid rgba(98, 154, 219, 0.3);
+    color: #A0AEC0;
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    
+    &:hover {
+      border-color: #00F5FF;
+      color: #00F5FF;
+    }
+  }
+  
+  .expandButton {
+    background: transparent;
+    border: 1px solid rgba(98, 154, 219, 0.3);
+    color: #A0AEC0;
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      border-color: #00F5FF;
+      color: #00F5FF;
+    }
+  }
+  
+  .actionsCell {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+  }
+  
+  .emptyState {
+    text-align: center;
+    padding: 2rem;
+    color: #A0AEC0;
+    font-style: italic;
+    background: rgba(15, 23, 42, 0.3);
+    border-radius: 8px;
+  }
+  
+  .detailsContent {
+    padding: 1.5rem;
+  }
+  
+  .detailItem {
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(98, 154, 219, 0.1);
+    
+    &:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+    
+    strong {
+      color: #00F5FF;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+  }
+  
+  .leadsList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 0.5rem;
+    
+    li {
+      background: rgba(30, 41, 59, 0.5);
+      padding: 0.5rem;
+      border-radius: 4px;
+      font-size: 0.85rem;
+    }
+  }
+}

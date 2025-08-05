@@ -1,7 +1,14 @@
 import React from 'react';
-import { TextField } from '@mui/material';
+import { TextField, TextFieldProps } from '@mui/material';
 
-const Input = ({ label, value, onChange, type = "text", ...props }) => {
+interface InputProps extends Omit<TextFieldProps, 'variant'> {
+  label: string;
+  value: string;
+  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  type?: string;
+}
+
+const Input: React.FC<InputProps> = ({ label, value, onChange, type = "text", ...props }) => {
   return (
     <TextField
       fullWidth

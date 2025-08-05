@@ -1,7 +1,11 @@
 import { Button as MuiButton } from '@mui/material';
 import React from 'react';
 
-const Button = ({ children, ...props }) => {
+interface ButtonProps extends React.ComponentProps<typeof MuiButton> {
+  children: React.ReactNode;
+}
+
+const Button: React.FC<ButtonProps> = ({ children, ...props }) => {
   return (
     <MuiButton 
       variant="contained" 

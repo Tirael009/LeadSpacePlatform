@@ -266,14 +266,17 @@ const RegisterPage = () => {
           </div>
 
           <div className={styles.inputGroup}>
-            <label className={styles.rememberMe}>
+            <div className={styles.termsCheckbox}>
               <input 
                 type="checkbox" 
+                id="terms"
                 checked={acceptTerms}
                 onChange={(e) => setAcceptTerms(e.target.checked)}
               />
-              <span>I agree to the <Link to="/terms" className={styles.forgotPassword}>Terms of Service</Link> and <Link to="/privacy" className={styles.forgotPassword}>Privacy Policy</Link></span>
-            </label>
+              <label htmlFor="terms">
+                I agree to the <Link to="/terms" className={styles.forgotPassword}>Terms of Service</Link> and <Link to="/privacy" className={styles.forgotPassword}>Privacy Policy</Link>
+              </label>
+            </div>
             {errors.terms && <div className={styles.errorMessage}>{errors.terms}</div>}
           </div>
 

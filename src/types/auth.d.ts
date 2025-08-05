@@ -23,12 +23,13 @@ export interface User {
   email: string;
   password: string;
   role: UserRole;
-  avatar?: string;
+  type: 'lender' | 'publisher';
   firstName?: string;
   lastName?: string;
-  type?: string;
   company?: string;
   website?: string;
+  avatar?: string;
+  phone?: string;
 }
 
 export interface AuthContextType {

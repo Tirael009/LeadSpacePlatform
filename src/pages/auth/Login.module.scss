@@ -5,20 +5,18 @@
   justify-content: center;
   align-items: center;
   background: #0b0f2f;
-  padding: 20px;
+  padding: 16px;
   background-image: url('/assets/images/bg-stars.png');
   background-size: cover;
   background-position: center;
   box-sizing: border-box;
-  
-  // Добавьте это для гарантии, что контейнер занимает всё доступное пространство
   flex: 1;
 }
 
 .loginCard {
   background: rgba(255, 255, 255, 0.04);
   border-radius: 24px;
-  padding: 40px;
+  padding: 32px;
   width: 100%;
   max-width: 420px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
@@ -27,10 +25,15 @@
   color: #ffffff;
   text-align: center;
   margin: 0 auto;
+
+  @media (max-width: 480px) {
+    padding: 24px 16px;
+    border-radius: 20px;
+  }
 }
 
 .loginHeader {
-  margin-bottom: 32px;
+  margin-bottom: 28px;
 
   .title {
     font-size: 28px;
@@ -38,29 +41,47 @@
     margin-bottom: 8px;
     color: #ffffff;
     line-height: 1.3;
+
+    @media (max-width: 768px) {
+      font-size: 24px;
+    }
+    @media (max-width: 480px) {
+      font-size: 22px;
+    }
   }
 
   .logoHighlight {
-    background: linear-gradient(135deg, #5b5ef3, #6f8aff);
+    background: linear-gradient(135deg, #6c6ff5, #8aa3ff);
+    -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
     display: inline-block;
+    text-shadow: 0 0 12px rgba(107, 111, 245, 0.4);
+    font-weight: 800;
   }
 
   .subtitle {
     font-size: 14px;
     opacity: 0.75;
     line-height: 1.5;
+    padding: 0 10px;
+    
+    @media (max-width: 480px) {
+      font-size: 13px;
+    }
   }
 }
 
 .userTypeToggle {
   display: flex;
   justify-content: center;
-  margin-bottom: 24px;
-  gap: 10px;
+  margin-bottom: 20px;
+  gap: 8px;
+  flex-wrap: wrap;
 
   .toggleButton {
     flex: 1;
+    min-width: 140px;
     background: transparent;
     border: 1px solid #5b5ef3;
     color: #5b5ef3;
@@ -70,6 +91,12 @@
     font-weight: 600;
     transition: all 0.3s ease;
     font-size: 14px;
+
+    @media (max-width: 480px) {
+      padding: 8px 10px;
+      font-size: 13px;
+      min-width: 120px;
+    }
 
     &.active {
       background: linear-gradient(135deg, #5b5ef3, #6f8aff);
@@ -85,7 +112,7 @@
 .loginForm {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
 }
 
 .inputGroup {
@@ -103,7 +130,7 @@
 
   .inputField {
     width: 100%;
-    padding: 12px 16px;
+    padding: 12px 14px;
     border-radius: 12px;
     border: 1px solid #2a2e50;
     background-color: #1b1f3a;
@@ -112,6 +139,11 @@
     outline: none;
     transition: border-color 0.3s ease;
     box-sizing: border-box;
+
+    @media (max-width: 480px) {
+      padding: 10px 12px;
+      font-size: 14px;
+    }
 
     &:focus {
       border-color: #5b5ef3;
@@ -125,7 +157,7 @@
 
   .passwordToggle {
     position: absolute;
-    right: 12px;
+    right: 10px;
     top: 50%;
     transform: translateY(-50%);
     background: transparent;
@@ -133,7 +165,7 @@
     color: #aaa;
     cursor: pointer;
     font-size: 16px;
-    padding: 8px;
+    padding: 6px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -142,15 +174,17 @@
 
 .rememberForgot {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   font-size: 13px;
   color: #aaa;
   align-items: center;
+  gap: 8px;
 
   .rememberMe {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     cursor: pointer;
 
     input {
@@ -163,6 +197,7 @@
     color: #6f8aff;
     text-decoration: none;
     transition: color 0.2s ease;
+    white-space: nowrap;
 
     &:hover {
       text-decoration: underline;
@@ -184,6 +219,11 @@
   transition: all 0.3s ease;
   margin-top: 10px;
 
+  @media (max-width: 480px) {
+    padding: 12px 0;
+    font-size: 14px;
+  }
+
   &:hover {
     box-shadow: 0 0 15px rgba(91, 94, 243, 0.5);
     transform: translateY(-1px);
@@ -198,21 +238,27 @@
   color: #ff4c4c;
   font-size: 13px;
   text-align: center;
-  margin: -10px 0 10px;
+  margin: -8px 0 8px;
   min-height: 20px;
 }
 
 .signupPrompt {
-  margin-top: 24px;
+  margin-top: 20px;
   font-size: 14px;
   color: #ccc;
   line-height: 1.5;
+
+  @media (max-width: 480px) {
+    font-size: 13px;
+    margin-top: 16px;
+  }
 
   .signupLink {
     color: #6f8aff;
     font-weight: 600;
     margin-left: 6px;
     transition: color 0.2s ease;
+    white-space: nowrap;
 
     &:hover {
       text-decoration: underline;

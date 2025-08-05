@@ -1,5 +1,4 @@
-//Register.module.scss
-@use './Login.module.scss' as *; // Используем стили из Login
+@use './Login.module.scss' as *;
 
 .registerContainer {
   @extend .loginContainer;
@@ -7,7 +6,11 @@
 
 .registerCard {
   @extend .loginCard;
-  max-width: 500px; // Немного шире для дополнительных полей
+  max-width: 500px;
+  
+  @media (max-width: 480px) {
+    padding: 20px 16px;
+  }
 }
 
 .registerHeader {
@@ -20,7 +23,7 @@
 
 .registerForm {
   @extend .loginForm;
-  gap: 16px;
+  gap: 14px;
 }
 
 .inputGroup {
@@ -41,19 +44,50 @@
 
 .errorMessage {
   @extend .errorMessage;
+  margin: -6px 0 6px;
 }
 
 .loginPrompt {
   @extend .signupPrompt;
 }
 
-// Дополнительные стили для двухколоночного расположения
 .twoColumns {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  gap: 14px;
 
   @media (max-width: 600px) {
     grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  @media (max-width: 480px) {
+    gap: 10px;
+  }
+}
+
+// Дополнительные стили для чекбокса в регистрации
+.termsCheckbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 13px;
+  color: #aaa;
+  margin-top: 8px;
+  
+  input {
+    margin-top: 3px;
+    accent-color: #5b5ef3;
+  }
+  
+  a {
+    color: #6f8aff;
+    text-decoration: none;
+    transition: color 0.2s ease;
+    
+    &:hover {
+      text-decoration: underline;
+      color: #5b5ef3;
+    }
   }
 }
