@@ -1,0 +1,16 @@
+[
+  {
+    "id": 1,
+    "type": "personal loan",
+    "region": "North",
+    "price": 100,
+    "availability": true
+  },
+  {
+    "id": 2,
+    "type": "mortgage",
+    "region": "South",
+    "price": 250,
+    "availability": true
+  }
+]

@@ -1,0 +1,14 @@
+[
+  {
+    "id": 1,
+    "role": "publisher",
+    "username": "publisher1",
+    "password": "password123"
+  },
+  {
+    "id": 2,
+    "role": "lender",
+    "username": "lender1",
+    "password": "password123"
+  }
+]
