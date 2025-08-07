@@ -1,0 +1,89 @@
+@import '../../../assets/styles/variables.scss';
+
+.panel {
+  background: rgba(15, 23, 42, 0.7);
+  border-radius: 8px;
+  box-shadow: 0 0 20px rgba(0, 245, 255, 0.1);
+  border: 1px solid rgba(98, 154, 219, 0.1);
+  backdrop-filter: blur(5px);
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+}
+
+.header {
+  padding: 1rem 1.5rem;
+  background: rgba(0, 0, 0, 0.3);
+  border-bottom: 1px solid rgba(98, 154, 219, 0.2);
+  
+  h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: $primary;
+    font-family: 'Orbitron', sans-serif;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .bellIcon {
+    color: $primary;
+    font-size: 1.2rem;
+  }
+}
+
+.notificationList {
+  padding: 0.5rem 0;
+}
+
+.notificationItem {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background: rgba(0, 245, 255, 0.05);
+  }
+  
+  &.unread {
+    background: rgba(0, 245, 255, 0.05);
+  }
+}
+
+.notificationIcon {
+  font-size: 1.2rem;
+  flex-shrink: 0;
+  
+  .info {
+    color: $primary;
+  }
+  
+  .warning {
+    color: #FED330;
+  }
+  
+  .success {
+    color: #26DE81;
+  }
+  
+  .error {
+    color: #FF4757;
+  }
+}
+
+.notificationContent {
+  flex: 1;
+  
+  p {
+    margin: 0 0 0.3rem 0;
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+  
+  span {
+    font-size: 0.75rem;
+    color: #A0AEC0;
+  }
+}

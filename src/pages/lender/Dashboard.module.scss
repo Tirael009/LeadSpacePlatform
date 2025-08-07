@@ -69,6 +69,28 @@
   }
 }
 
+.supportButton {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  width: 100%;
+  padding: 1rem 1.5rem;
+  background: rgba(0, 245, 255, 0.1);
+  border: none;
+  color: #00F5FF;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: left;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  
+  &:hover {
+    background: rgba(0, 245, 255, 0.2);
+  }
+}
+
 .topNav {
   grid-area: topnav;
   display: flex;
@@ -640,31 +662,13 @@
     }
   }
   
-  .userInfoSidebar {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 0 1.5rem 1.5rem;
-    border-bottom: 1px solid rgba(98, 154, 219, 0.1);
-    margin-bottom: 1rem;
-    
-    .avatarSidebar {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 2px solid rgba(0, 245, 255, 0.3);
-    }
-    
-    .userName {
-      font-weight: 600;
-      font-size: 0.95rem;
-    }
-    
-    .userCompany {
-      font-size: 0.8rem;
-      color: #A0AEC0;
-    }
+  .auctionBadge {
+    background: #FF4757;
+    color: white;
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    margin-left: 0.5rem;
   }
 
   .primaryNav {
@@ -823,6 +827,27 @@
   }
 }
 
+.welcomeBlock {
+  background: rgba(15, 23, 42, 0.7);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 0 15px rgba(0, 245, 255, 0.1);
+  border: 1px solid rgba(98, 154, 219, 0.1);
+  
+  h2 {
+    color: #00F5FF;
+    font-size: 1.5rem;
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+  }
+  
+  p {
+    color: #A0AEC0;
+    margin-bottom: 0;
+  }
+}
+
 .dashboardContent {
   .sectionHeader {
     display: flex;
@@ -866,15 +891,23 @@
   }
   
   .statsRow {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    display: flex;
+    flex-wrap: wrap;
     gap: 1.5rem;
     margin-bottom: 2rem;
+    
+    > * {
+      flex: 1;
+      min-width: 200px;
+    }
   }
 
   .marketplaceContainer {
     .marketplaceHeader {
       margin-bottom: 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       flex-wrap: wrap;
       gap: 1rem;
       
@@ -882,7 +915,6 @@
         display: flex;
         gap: 1rem;
         align-items: center;
-        margin-top: 0.5rem;
       }
     }
     
@@ -1625,6 +1657,83 @@
       }
     }
     
+    .purchaseHistory {
+      background: rgba(15, 23, 42, 0.7);
+      border-radius: 8px;
+      padding: 1.5rem;
+      box-shadow: 0 0 15px rgba(0, 245, 255, 0.1);
+      border: 1px solid rgba(98, 154, 219, 0.1);
+      margin-bottom: 2rem;
+      
+      h3 {
+        font-family: 'Orbitron', sans-serif;
+        color: #00F5FF;
+        margin: 0 0 1.5rem 0;
+        font-size: 1.2rem;
+      }
+      
+      .purchaseTable {
+        width: 100%;
+        border-collapse: collapse;
+        
+        th, td {
+          padding: 1rem;
+          text-align: left;
+          border-bottom: 1px solid rgba(98, 154, 219, 0.1);
+        }
+        
+        th {
+          font-weight: 600;
+          color: #00F5FF;
+          background: rgba(0, 245, 255, 0.05);
+          font-family: 'Orbitron', sans-serif;
+          letter-spacing: 1px;
+          font-size: 0.8rem;
+          text-transform: uppercase;
+        }
+        
+        tr:last-child td {
+          border-bottom: none;
+        }
+        
+        .statusBadge {
+          display: inline-block;
+          padding: 0.3rem 0.8rem;
+          border-radius: 4px;
+          font-size: 0.8rem;
+          font-weight: 500;
+          
+          &.completed {
+            background: rgba(38, 222, 129, 0.1);
+            color: #26DE81;
+          }
+          
+          &.pending {
+            background: rgba(254, 211, 48, 0.1);
+            color: #FED330;
+          }
+        }
+        
+        .detailsButton {
+          background: transparent;
+          border: 1px solid rgba(98, 154, 219, 0.3);
+          color: #A0AEC0;
+          padding: 0.4rem 0.8rem;
+          border-radius: 4px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 0.3rem;
+          transition: all 0.3s ease;
+          
+          &:hover {
+            border-color: #00F5FF;
+            color: #00F5FF;
+          }
+        }
+      }
+    }
+    
     .invoiceSection {
       background: rgba(15, 23, 42, 0.7);
       border-radius: 8px;
@@ -1995,6 +2104,241 @@
             }
           }
         }
+      }
+    }
+  }
+  
+  .settingsContainer {
+    .settingsSection {
+      margin-bottom: 2rem;
+      
+      h3 {
+        font-family: 'Orbitron', sans-serif;
+        color: #00F5FF;
+        margin-bottom: 1.5rem;
+        font-size: 1.2rem;
+      }
+      
+      .integrationsGrid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+        
+        .integrationCard {
+          background: rgba(15, 23, 42, 0.7);
+          border-radius: 8px;
+          padding: 1.5rem;
+          box-shadow: 0 0 10px rgba(0, 245, 255, 0.1);
+          border: 1px solid rgba(98, 154, 219, 0.1);
+          
+          .integrationHeader {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            
+            .integrationIcon {
+              font-size: 1.5rem;
+              color: #00F5FF;
+              background: rgba(0, 245, 255, 0.1);
+              width: 48px;
+              height: 48px;
+              border-radius: 50%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            }
+          }
+          
+          p {
+            color: #A0AEC0;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+          }
+          
+          .configureButton {
+            width: 100%;
+            background: transparent;
+            border: 1px solid rgba(98, 154, 219, 0.3);
+            color: #A0AEC0;
+            padding: 0.7rem;
+            border-radius: 6px;
+            cursor: pointer;
+            
+            &:hover {
+              border-color: #00F5FF;
+              color: #00F5FF;
+            }
+          }
+        }
+      }
+      
+      .notificationSettings {
+        .settingItem {
+          margin-bottom: 1rem;
+          
+          label {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            cursor: pointer;
+            
+            input {
+              width: 18px;
+              height: 18px;
+            }
+          }
+        }
+      }
+      
+      .securitySettings {
+        .securityItem {
+          background: rgba(15, 23, 42, 0.7);
+          border-radius: 8px;
+          padding: 1.5rem;
+          box-shadow: 0 0 10px rgba(0, 245, 255, 0.1);
+          border: 1px solid rgba(98, 154, 219, 0.1);
+          margin-bottom: 1.5rem;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          
+          .enableButton, .viewButton {
+            background: transparent;
+            border: 1px solid rgba(98, 154, 219, 0.3);
+            color: #A0AEC0;
+            padding: 0.7rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            
+            &:hover {
+              border-color: #00F5FF;
+              color: #00F5FF;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+.supportChat {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 350px;
+  background: rgba(15, 23, 42, 0.95);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(98, 154, 219, 0.3);
+  z-index: 1000;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  
+  .chatHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    background: rgba(0, 0, 0, 0.3);
+    border-bottom: 1px solid rgba(98, 154, 219, 0.2);
+    
+    h3 {
+      margin: 0;
+      font-size: 1rem;
+      color: #00F5FF;
+      font-family: 'Orbitron', sans-serif;
+    }
+    
+    button {
+      background: transparent;
+      border: none;
+      color: #A0AEC0;
+      cursor: pointer;
+      font-size: 1.2rem;
+      
+      &:hover {
+        color: #FF4757;
+      }
+    }
+  }
+  
+  .chatMessages {
+    height: 300px;
+    padding: 1rem;
+    overflow-y: auto;
+    
+    .message {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      
+      .avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: #00F5FF;
+        color: #0f172a;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        flex-shrink: 0;
+      }
+      
+      .content {
+        .name {
+          font-weight: 600;
+          color: #00F5FF;
+          margin-bottom: 0.2rem;
+        }
+        
+        .text {
+          background: rgba(0, 245, 255, 0.1);
+          padding: 0.7rem;
+          border-radius: 8px;
+          display: inline-block;
+        }
+        
+        .time {
+          font-size: 0.7rem;
+          color: #64748b;
+          margin-top: 0.3rem;
+        }
+      }
+    }
+  }
+  
+  .chatInput {
+    display: flex;
+    padding: 1rem;
+    border-top: 1px solid rgba(98, 154, 219, 0.1);
+    
+    input {
+      flex: 1;
+      padding: 0.7rem;
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(98, 154, 219, 0.3);
+      border-radius: 6px;
+      color: #E2E8F0;
+      margin-right: 0.5rem;
+    }
+    
+    button {
+      background: rgba(0, 245, 255, 0.1);
+      border: 1px solid rgba(0, 245, 255, 0.3);
+      color: #00F5FF;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      
+      &:hover {
+        background: rgba(0, 245, 255, 0.2);
       }
     }
   }

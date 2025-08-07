@@ -11,41 +11,36 @@ import {
   FiCreditCard,
   FiLink,
   FiUsers,
-  FiAward,
-  FiBookOpen,
-  FiUserPlus,
-  FiFileText,
   FiSettings,
   FiShare2,
   FiCopy,
   FiCheck,
   FiX,
-  FiPlay,
   FiEdit,
-  FiDownload,
   FiSearch,
-  FiZap,
   FiUser,
-  FiLock,
   FiLogOut,
   FiMessageCircle,
   FiInfo,
   FiAlertTriangle,
   FiCheckCircle,
-  FiXCircle
+  FiXCircle,
+  FiHome,
+  FiLayers,
+  FiFile
 } from 'react-icons/fi';
 import StatsCard from '../../components/ui/StatsCard/StatsCard';
 import CampaignCard from '../../components/campaigns/CampaignCard/CampaignCard';
 import CampaignFilter from '../../components/campaigns/CampaignFilter/CampaignFilter';
 import TrafficSources from '../../components/ui/TrafficSources/TrafficSources';
-import ResourceUsage from '../../components/ui/ResourceUsage/ResourceUsage';
+import NotificationPanel from '../../components/ui/NotificationPanel/NotificationPanel';
 import styles from './Dashboard.module.scss';
 
 interface Campaign {
   id: string;
   name: string;
   niche: string;
-  status: 'active' | 'paused' | 'archived';
+  status: 'active' | 'paused' | 'archived' | 'moderation' | 'rejected';
   ctr: string;
   clicks: number;
   conversions: number;
@@ -55,6 +50,9 @@ interface Campaign {
   endDate?: string;
   landingPage: string;
   source: string;
+  leadsCount: number;
+  epc: number;
+  cr: number;
 }
 
 interface TrafficSource {
@@ -73,6 +71,7 @@ interface Notification {
   message: string;
   time: string;
   read: boolean;
+  action?: () => void;
 }
 
 interface TrackingLink {
@@ -85,37 +84,6 @@ interface TrackingLink {
   conversions: number;
   geo: string;
   status: 'active' | 'paused';
-}
-
-interface ReputationBadge {
-  id: string;
-  name: string;
-  description: string;
-  earned: boolean;
-}
-
-interface Course {
-  id: string;
-  title: string;
-  description: string;
-  progress: number;
-  duration: string;
-}
-
-interface Referral {
-  id: string;
-  name: string;
-  date: string;
-  earnings: number;
-  status: 'active' | 'pending' | 'inactive';
-}
-
-interface Document {
-  id: string;
-  name: string;
-  type: string;
-  date: string;
-  status: 'signed' | 'pending';
 }
 
 interface AuthUser {
@@ -140,24 +108,16 @@ interface DashboardStats {
   topCampaigns: Campaign[];
   trafficSources: TrafficSource[];
   recentPayouts: { date: string; amount: number; status: string; method: string }[];
-  reputation: {
-    level: string;
-    status: string;
-    returnRate: number;
-    leadsSold: number;
-    aiRating: number;
-    nextLevel: string;
-  };
-  badges: ReputationBadge[];
-  courses: Course[];
-  referrals: Referral[];
-  documents: Document[];
+  leadsGenerated: number;
+  epc: number;
+  cr: number;
+  returnRate: number;
 }
 
 const PublisherDashboard = () => {
   const authContext = useAuth();
   const [user, setUser] = useState<AuthUser | null>(null);
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'campaigns' | 'trackingLinks' | 'earnings' | 'reputation' | 'learning' | 'referrals' | 'documents' | 'settings'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'campaigns' | 'trackingLinks' | 'earnings' | 'documents' | 'settings'>('dashboard');
   const [filter, setFilter] = useState({
     status: '',
     dateRange: '30d',
@@ -166,6 +126,7 @@ const PublisherDashboard = () => {
     niche: ''
   });
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  const niches = Array.from(new Set(campaigns.map(campaign => campaign.niche)));
   const [trackingLinks, setTrackingLinks] = useState<TrackingLink[]>([]);
   const [stats, setStats] = useState<DashboardStats>({
     totalClicks: 0,
@@ -180,41 +141,30 @@ const PublisherDashboard = () => {
     topCampaigns: [],
     trafficSources: [],
     recentPayouts: [],
-    reputation: {
-      level: 'Silver Partner',
-      status: 'reliable',
-      returnRate: 2.1,
-      leadsSold: 283,
-      aiRating: 4.7,
-      nextLevel: 'Gold Publisher'
-    },
-    badges: [],
-    courses: [],
-    referrals: [],
-    documents: []
+    leadsGenerated: 142,
+    epc: 2.15,
+    cr: 5.2,
+    returnRate: 2.1
   });
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [language, setLanguage] = useState<'en' | 'es' | 'ru'>('en');
-  const [timezone, setTimezone] = useState('GMT');
   const [searchQuery, setSearchQuery] = useState('');
-  const [quickActionsOpen, setQuickActionsOpen] = useState(false);
   const [notificationDropdownOpen, setNotificationDropdownOpen] = useState(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [languageMenuOpen, setLanguageMenuOpen] = useState(false);
   const [aiAssistantOpen, setAiAssistantOpen] = useState(false);
+  const [mobileActionsOpen, setMobileActionsOpen] = useState(false);
+  const [dateRange, setDateRange] = useState('30d');
   
-  const quickActionsRef = useRef<HTMLDivElement>(null);
   const notificationsRef = useRef<HTMLDivElement>(null);
   const profileRef = useRef<HTMLDivElement>(null);
   const languageRef = useRef<HTMLDivElement>(null);
+  const mobileActionsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (quickActionsRef.current && !quickActionsRef.current.contains(event.target as Node)) {
-        setQuickActionsOpen(false);
-      }
       if (notificationsRef.current && !notificationsRef.current.contains(event.target as Node)) {
         setNotificationDropdownOpen(false);
       }
@@ -223,6 +173,9 @@ const PublisherDashboard = () => {
       }
       if (languageRef.current && !languageRef.current.contains(event.target as Node)) {
         setLanguageMenuOpen(false);
+      }
+      if (mobileActionsRef.current && !mobileActionsRef.current.contains(event.target as Node)) {
+        setMobileActionsOpen(false);
       }
     };
 
@@ -261,7 +214,10 @@ const PublisherDashboard = () => {
         payout: 2130,
         startDate: '2023-04-15',
         landingPage: 'https://example.com/mortgage',
-        source: 'Google Ads'
+        source: 'Google Ads',
+        leadsCount: 142,
+        epc: 1.5,
+        cr: 5.0
       },
       { 
         id: '2', 
@@ -275,7 +231,10 @@ const PublisherDashboard = () => {
         payout: 1470,
         startDate: '2023-05-01',
         landingPage: 'https://example.com/auto-insurance',
-        source: 'Facebook Ads'
+        source: 'Facebook Ads',
+        leadsCount: 98,
+        epc: 1.3,
+        cr: 6.4
       },
       { 
         id: '3', 
@@ -290,8 +249,45 @@ const PublisherDashboard = () => {
         startDate: '2023-03-10',
         endDate: '2023-05-20',
         landingPage: 'https://example.com/credit-cards',
-        source: 'Email'
+        source: 'Email',
+        leadsCount: 43,
+        epc: 0.98,
+        cr: 4.9
       },
+      { 
+        id: '4', 
+        name: 'Personal Loans AU', 
+        niche: 'Personal Loans',
+        status: 'moderation', 
+        ctr: '0.0%', 
+        clicks: 0, 
+        conversions: 0, 
+        revenue: 0, 
+        payout: 0,
+        startDate: '2023-06-01',
+        landingPage: 'https://example.com/personal-loans',
+        source: 'Google Ads',
+        leadsCount: 0,
+        epc: 0,
+        cr: 0
+      },
+      { 
+        id: '5', 
+        name: 'Student Loans CA', 
+        niche: 'Education',
+        status: 'rejected', 
+        ctr: '0.0%', 
+        clicks: 0, 
+        conversions: 0, 
+        revenue: 0, 
+        payout: 0,
+        startDate: '2023-05-25',
+        landingPage: 'https://example.com/student-loans',
+        source: 'Facebook Ads',
+        leadsCount: 0,
+        epc: 0,
+        cr: 0
+      }
     ];
 
     const mockTrackingLinks: TrackingLink[] = [
@@ -342,39 +338,10 @@ const PublisherDashboard = () => {
         { date: '2023-04-30', amount: 980, status: 'processed', method: 'Bank Transfer' },
         { date: '2023-04-15', amount: 1100, status: 'processed', method: 'PayPal' }
       ],
-      reputation: {
-        level: 'Silver Partner',
-        status: 'reliable',
-        returnRate: 2.1,
-        leadsSold: 283,
-        aiRating: 4.7,
-        nextLevel: 'Gold Publisher'
-      },
-      badges: [
-        { id: '1', name: '100 Leads Without Return', description: 'Generated 100 leads without any returns', earned: true },
-        { id: '2', name: 'Auto Loans Expert', description: 'Top performer in auto loans niche', earned: true },
-        { id: '3', name: 'Gold Publisher', description: 'Achieve Gold level status', earned: false },
-        { id: '4', name: 'Quick Starter', description: 'Reached first $1000 in first month', earned: true }
-      ],
-      courses: [
-        { 
-          id: '1', 
-          title: 'Lead Generation Mastery', 
-          description: 'Complete guide to maximizing your earnings through effective lead generation strategies', 
-          progress: 35, 
-          duration: '8h 30m' 
-        }
-      ],
-      referrals: [
-        { id: '1', name: 'John Smith', date: '2023-04-10', earnings: 125, status: 'active' },
-        { id: '2', name: 'Emma Johnson', date: '2023-05-05', earnings: 0, status: 'pending' },
-        { id: '3', name: 'Mike Brown', date: '2023-03-22', earnings: 85, status: 'inactive' }
-      ],
-      documents: [
-        { id: '1', name: 'Publisher Agreement', type: 'Contract', date: '2023-01-15', status: 'signed' },
-        { id: '2', name: 'DPA Compliance', type: 'Data Agreement', date: '2023-01-15', status: 'signed' },
-        { id: '3', name: 'Exclusive Partnership', type: 'Contract', date: '2023-05-20', status: 'pending' }
-      ]
+      leadsGenerated: 142,
+      epc: 2.15,
+      cr: 5.2,
+      returnRate: 2.1
     };
 
     const mockNotifications: Notification[] = [
@@ -387,27 +354,36 @@ const PublisherDashboard = () => {
       },
       { 
         id: '2', 
-        type: 'info', 
-        message: 'Campaign Credit Cards UK was paused', 
+        type: 'warning', 
+        message: 'Campaign "Student Loans CA" was rejected', 
         time: '2 hours ago', 
-        read: false 
+        read: false,
+        action: () => setActiveTab('campaigns')
       },
       { 
         id: '3', 
+        type: 'info', 
+        message: 'Campaign "Personal Loans AU" requires moderation', 
+        time: '3 hours ago', 
+        read: false,
+        action: () => setActiveTab('campaigns')
+      },
+      { 
+        id: '4', 
         type: 'success', 
         message: 'Payout $1,250 processed', 
         time: '3 days ago', 
         read: true 
       },
       { 
-        id: '4', 
+        id: '5', 
         type: 'warning', 
         message: 'Lead return from Auto Insurance campaign', 
         time: '1 day ago', 
         read: false 
       },
       { 
-        id: '5', 
+        id: '6', 
         type: 'info', 
         message: 'New course available: Advanced Lead Optimization', 
         time: '2 days ago', 
@@ -436,6 +412,8 @@ const PublisherDashboard = () => {
 
   const handleCampaignAction = (campaignId: string, action: string) => {
     console.log(`${action} campaign:`, campaignId);
+    // В реальном приложении здесь будет API запрос
+    alert(`Campaign ${action} action triggered for ID: ${campaignId}`);
   };
 
   const markNotificationAsRead = (id: string) => {
@@ -445,32 +423,46 @@ const PublisherDashboard = () => {
     setUnreadCount(prev => prev - 1);
   };
 
-  const handleQuickAction = (action: string) => {
-    console.log('Quick action:', action);
-    setQuickActionsOpen(false);
-  };
-
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
+    alert('Copied to clipboard: ' + text);
   };
 
   const toggleLanguage = (lang: 'en' | 'es' | 'ru') => {
     setLanguage(lang);
     setLanguageMenuOpen(false);
+    alert(`Language changed to ${lang}`);
   };
 
   const requestPayout = () => {
     if (stats.balance >= 100) {
       console.log('Requesting payout:', stats.balance);
       setStats(prev => ({ ...prev, balance: 0 }));
+      alert(`Payout requested for $${stats.balance}`);
     } else {
       console.log('Minimum payout is $100');
+      alert('Minimum payout amount is $100');
     }
   };
 
   const navigate = (path: string) => {
     console.log('Navigating to:', path);
     setProfileMenuOpen(false);
+    // В реальном приложении здесь будет навигация
+    alert(`Navigating to: ${path}`);
+  };
+  
+  const handleTabClick = (tab: typeof activeTab) => {
+    setActiveTab(tab);
+    if (window.innerWidth <= 1024) {
+      setSidebarOpen(false);
+    }
+  };
+
+  const handleDateRangeChange = (range: string) => {
+    setDateRange(range);
+    // В реальном приложении здесь будет обновление данных
+    alert(`Date range changed to: ${range}`);
   };
 
   return (
@@ -479,7 +471,7 @@ const PublisherDashboard = () => {
       <div className={styles.topNav}>
         <div className={styles.brand}>
           <span className={styles.logo}>🚀</span>
-          <h1>LeadSpace Publisher</h1>
+          <h1>LeadSpace</h1>
         </div>
         
         {/* Search Bar */}
@@ -494,37 +486,6 @@ const PublisherDashboard = () => {
         </div>
         
         <div className={styles.navControls}>
-          {/* Quick Actions Dropdown */}
-          <div className={styles.quickActions} ref={quickActionsRef}>
-            <button 
-              className={styles.quickActionsButton}
-              onClick={() => setQuickActionsOpen(!quickActionsOpen)}
-            >
-              <FiZap />
-              <span>Quick Actions</span>
-            </button>
-            {quickActionsOpen && (
-              <div className={styles.quickActionsDropdown}>
-                <button onClick={() => handleQuickAction('new_campaign')}>
-                  <FiPlus />
-                  <span>Create Campaign</span>
-                </button>
-                <button onClick={() => handleQuickAction('tracking_link')}>
-                  <FiLink />
-                  <span>Create Tracking Link</span>
-                </button>
-                <button onClick={() => handleQuickAction('request_payout')}>
-                  <FiCreditCard />
-                  <span>Request Payout</span>
-                </button>
-                <button onClick={() => handleQuickAction('report')}>
-                  <FiBarChart2 />
-                  <span>Campaign Report</span>
-                </button>
-              </div>
-            )}
-          </div>
-          
           {/* Financial Indicators */}
           <div className={styles.financialIndicators}>
             <div className={styles.indicator}>
@@ -540,25 +501,6 @@ const PublisherDashboard = () => {
               <span>{stats.totalClicks.toLocaleString()}</span>
             </div>
           </div>
-          
-          {/* Reputation Badge */}
-          <div className={styles.reputationBadge}>
-            <FiAward className={styles.badgeIcon} />
-            <span className={styles.levelBadge}>{stats.reputation.level}</span>
-            <span className={`${styles.status} ${styles[stats.reputation.status]}`}>
-              {stats.reputation.status === 'reliable' ? 'Reliable' : 
-               stats.reputation.status === 'verification' ? 'Verification' : 'Under Review'}
-            </span>
-          </div>
-          
-          {/* AI Assistant */}
-          <button 
-            className={styles.aiAssistant}
-            onClick={() => setAiAssistantOpen(true)}
-          >
-            <FiMessageCircle />
-            <span>AI Manager</span>
-          </button>
           
           {/* Language and Timezone Dropdown */}
           <div className={styles.languageToggle} ref={languageRef}>
@@ -579,18 +521,6 @@ const PublisherDashboard = () => {
                 <button onClick={() => toggleLanguage('ru')}>
                   Русский 🇷🇺
                 </button>
-                <div className={styles.timezoneSection}>
-                  <label>Timezone</label>
-                  <select 
-                    value={timezone} 
-                    onChange={(e) => setTimezone(e.target.value)}
-                  >
-                    <option value="PST">GMT-8:00 (PST)</option>
-                    <option value="EST">GMT-5:00 (EST)</option>
-                    <option value="GMT">GMT+0:00 (GMT)</option>
-                    <option value="MSK">GMT+3:00 (MSK)</option>
-                  </select>
-                </div>
               </div>
             )}
           </div>
@@ -615,7 +545,10 @@ const PublisherDashboard = () => {
                     <div 
                       key={notification.id} 
                       className={`${styles.notificationItem} ${notification.read ? '' : styles.unread}`}
-                      onClick={() => markNotificationAsRead(notification.id)}
+                      onClick={() => {
+                        markNotificationAsRead(notification.id);
+                        notification.action?.();
+                      }}
                     >
                       <div className={styles.notificationIcon}>
                         {notification.type === 'info' && <FiInfo className={styles.info} />}
@@ -667,13 +600,12 @@ const PublisherDashboard = () => {
                     <FiUser />
                     <span>My Profile</span>
                   </button>
-                  <button onClick={() => navigate('/documents')}>
-                    <FiFileText />
-                    <span>Documents</span>
-                  </button>
-                  <button onClick={() => navigate('/security')}>
-                    <FiLock />
-                    <span>Security</span>
+                  <button onClick={() => { 
+                    setProfileMenuOpen(false); 
+                    setAiAssistantOpen(true);
+                  }}>
+                    <FiMessageCircle />
+                    <span>AI Manager</span>
                   </button>
                   <button onClick={() => navigate('/settings')}>
                     <FiSettings />
@@ -694,63 +626,75 @@ const PublisherDashboard = () => {
           >
             ☰
           </button>
+          
+          {/* Mobile only actions menu */}
+          <button 
+            className={styles.mobileActionsMenu}
+            onClick={() => setMobileActionsOpen(!mobileActionsOpen)}
+          >
+            •••
+          </button>
         </div>
       </div>
+      
+      {/* Mobile actions dropdown */}
+      {mobileActionsOpen && (
+        <div className={styles.mobileActionsDropdown} ref={mobileActionsRef}>
+          <button className={styles.actionItem} onClick={() => handleCampaignAction('new', 'create')}>
+            <FiPlus />
+            <span>Create Campaign</span>
+          </button>
+          <button className={styles.actionItem} onClick={() => navigate('/tracking-links')}>
+            <FiLink />
+            <span>Create Tracking Link</span>
+          </button>
+          <button className={styles.actionItem} onClick={() => setAiAssistantOpen(true)}>
+            <FiMessageCircle />
+            <span>AI Manager</span>
+          </button>
+          <button className={styles.actionItem} onClick={() => navigate('/settings')}>
+            <FiSettings />
+            <span>Settings</span>
+          </button>
+        </div>
+      )}
 
       {/* Sidebar Navigation */}
       <aside className={styles.sidebar}>
         <nav className={styles.primaryNav}>
           <ul>
             <li className={activeTab === 'dashboard' ? styles.active : ''}>
-              <button onClick={() => setActiveTab('dashboard')}>
-                <FiTrendingUp />
+              <button onClick={() => handleTabClick('dashboard')}>
+                <FiHome />
                 <span>Overview</span>
               </button>
             </li>
             <li className={activeTab === 'campaigns' ? styles.active : ''}>
-              <button onClick={() => setActiveTab('campaigns')}>
-                <FiLink />
+              <button onClick={() => handleTabClick('campaigns')}>
+                <FiLayers />
                 <span>My Campaigns</span>
               </button>
             </li>
             <li className={activeTab === 'trackingLinks' ? styles.active : ''}>
-              <button onClick={() => setActiveTab('trackingLinks')}>
+              <button onClick={() => handleTabClick('trackingLinks')}>
                 <FiShare2 />
                 <span>Tracking Links</span>
               </button>
             </li>
             <li className={activeTab === 'earnings' ? styles.active : ''}>
-              <button onClick={() => setActiveTab('earnings')}>
+              <button onClick={() => handleTabClick('earnings')}>
                 <FiDollarSign />
                 <span>Earnings & Payouts</span>
               </button>
             </li>
-            <li className={activeTab === 'reputation' ? styles.active : ''}>
-              <button onClick={() => setActiveTab('reputation')}>
-                <FiAward />
-                <span>Reputation & Levels</span>
-              </button>
-            </li>
-            <li className={activeTab === 'learning' ? styles.active : ''}>
-              <button onClick={() => setActiveTab('learning')}>
-                <FiBookOpen />
-                <span>Learning</span>
-              </button>
-            </li>
-            <li className={activeTab === 'referrals' ? styles.active : ''}>
-              <button onClick={() => setActiveTab('referrals')}>
-                <FiUserPlus />
-                <span>Referrals</span>
-              </button>
-            </li>
             <li className={activeTab === 'documents' ? styles.active : ''}>
-              <button onClick={() => setActiveTab('documents')}>
-                <FiFileText />
+              <button onClick={() => handleTabClick('documents')}>
+                <FiFile />
                 <span>Documents</span>
               </button>
             </li>
             <li className={activeTab === 'settings' ? styles.active : ''}>
-              <button onClick={() => setActiveTab('settings')}>
+              <button onClick={() => handleTabClick('settings')}>
                 <FiSettings />
                 <span>Profile Settings</span>
               </button>
@@ -787,13 +731,6 @@ const PublisherDashboard = () => {
             </li>
           </ul>
         </div>
-
-        <ResourceUsage 
-          leadsUsed={campaigns.length} 
-          leadsLimit={50} 
-          storageUsed={85} 
-          storageLimit={100}
-        />
       </aside>
 
       {/* Main Content Area */}
@@ -805,9 +742,6 @@ const PublisherDashboard = () => {
               {activeTab === 'campaigns' && 'Campaign Management'}
               {activeTab === 'trackingLinks' && 'Tracking Links'}
               {activeTab === 'earnings' && 'Earnings & Payouts'}
-              {activeTab === 'reputation' && 'Reputation & Levels'}
-              {activeTab === 'learning' && 'Learning Center'}
-              {activeTab === 'referrals' && 'Referral Program'}
               {activeTab === 'documents' && 'Documents & Contracts'}
               {activeTab === 'settings' && 'Profile Settings'}
             </h1>
@@ -816,12 +750,33 @@ const PublisherDashboard = () => {
               {activeTab === 'campaigns' && 'Manage and track your campaigns'}
               {activeTab === 'trackingLinks' && 'Create and manage your tracking links'}
               {activeTab === 'earnings' && 'View earnings and payout history'}
-              {activeTab === 'reputation' && 'Your reputation status and achievements'}
-              {activeTab === 'learning' && 'Courses and resources to improve your skills'}
-              {activeTab === 'referrals' && 'Invite others and earn bonuses'}
               {activeTab === 'documents' && 'Legal documents and contracts'}
               {activeTab === 'settings' && 'Update your profile and preferences'}
             </p>
+          </div>
+          <div className={styles.headerRight}>
+            {activeTab !== 'settings' && (
+              <div className={styles.dateRangeSelector}>
+                <select 
+                  value={dateRange} 
+                  onChange={(e) => handleDateRangeChange(e.target.value)}
+                >
+                  <option value="today">Today</option>
+                  <option value="week">This Week</option>
+                  <option value="month">This Month</option>
+                  <option value="30d">Last 30 Days</option>
+                  <option value="90d">Last 90 Days</option>
+                </select>
+              </div>
+            )}
+            {activeTab === 'campaigns' && (
+              <button 
+                className={styles.addCampaignButton}
+                onClick={() => handleCampaignAction('new', 'create')}
+              >
+                <FiPlus /> Add Campaign
+              </button>
+            )}
           </div>
         </header>
 
@@ -874,36 +829,59 @@ const PublisherDashboard = () => {
             <>
               <section className={styles.statsSection}>
                 <StatsCard 
-                  title="Total Clicks" 
-                  value={stats.totalClicks} 
-                  change={stats.clicksChange} 
-                  icon={<FiTrendingUp />}
-                />
-                <StatsCard 
-                  title="Conversions" 
-                  value={stats.totalConversions} 
+                  title="Leads Generated" 
+                  value={stats.leadsGenerated} 
                   change={stats.conversionsChange} 
-                  icon={<FiPieChart />}
+                  icon={<FiUser />}
+                  color="#00F5FF"
                 />
                 <StatsCard 
-                  title="Revenue" 
+                  title="Total Revenue" 
                   value={`$${stats.revenue.toLocaleString()}`} 
                   change={stats.revenueChange} 
                   icon={<FiDollarSign />}
+                  color="#9D00FF"
                 />
                 <StatsCard 
-                  title="Your Payout" 
-                  value={`$${stats.payout.toLocaleString()}`} 
-                  change={stats.payoutChange} 
+                  title="EPC" 
+                  value={`$${stats.epc.toFixed(2)}`} 
+                  change={8.5} 
+                  icon={<FiTrendingUp />}
+                  color="#26DE81"
+                />
+                <StatsCard 
+                  title="CR" 
+                  value={`${stats.cr.toFixed(1)}%`} 
+                  change={1.2} 
+                  icon={<FiPieChart />}
+                  color="#FED330"
+                />
+                <StatsCard 
+                  title="Return Rate" 
+                  value={`${stats.returnRate.toFixed(1)}%`} 
+                  change={-0.3} 
+                  icon={<FiBarChart2 />}
+                  color="#FF4D9D"
+                />
+                <StatsCard 
+                  title="Balance" 
+                  value={`$${stats.balance.toLocaleString()}`} 
+                  change={0} 
                   icon={<FiCreditCard />}
+                  color="#00F5FF"
                 />
               </section>
 
               <div className={styles.analyticsGrid}>
                 <div className={styles.chartContainer}>
-                  <h3>Top Campaigns</h3>
+                  <h3>Performance Overview</h3>
                   <div className={styles.chartPlaceholder}>
-                    Top performing campaigns chart
+                    <div className={styles.chartLegend}>
+                      <span style={{ backgroundColor: '#00F5FF' }}>Leads</span>
+                      <span style={{ backgroundColor: '#9D00FF' }}>Revenue</span>
+                      <span style={{ backgroundColor: '#26DE81' }}>EPC</span>
+                    </div>
+                    Performance chart visualization
                   </div>
                 </div>
                 
@@ -911,69 +889,29 @@ const PublisherDashboard = () => {
               </div>
               
               <div className={styles.tableWrapper}>
-                <h3 className={styles.sectionTitle}>Recent Payouts</h3>
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Date</th>
-                      <th>Amount</th>
-                      <th>Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {stats.recentPayouts.map((payout, index) => (
-                      <tr key={index}>
-                        <td>{payout.date}</td>
-                        <td>${payout.amount.toLocaleString()}</td>
-                        <td>
-                          <span className={`${styles.status} ${styles.active}`}>
-                            {payout.status}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                <div className={styles.sectionHeader}>
+                  <h3 className={styles.sectionTitle}>Active Campaigns</h3>
+                  <button 
+                    className={styles.viewAllButton}
+                    onClick={() => setActiveTab('campaigns')}
+                  >
+                    View All
+                  </button>
+                </div>
+                <div className={styles.leadsGrid}>
+                  {stats.topCampaigns.map((campaign) => (
+                    <CampaignCard 
+                      key={campaign.id} 
+                      campaign={campaign} 
+                      onEdit={() => handleCampaignAction(campaign.id, 'edit')}
+                      onPause={() => handleCampaignAction(campaign.id, 'pause')}
+                      onArchive={() => handleCampaignAction(campaign.id, 'archive')}
+                    />
+                  ))}
+                </div>
               </div>
               
-              <div className={styles.reputationCard}>
-                <div className={styles.reputationHeader}>
-                  <div className={styles.levelInfo}>
-                    <h3>Your Reputation Status</h3>
-                    <p>Current level: {stats.reputation.level}</p>
-                  </div>
-                  <div className={styles.levelStatus}>
-                    <span className={styles.levelBadge}>{stats.reputation.level}</span>
-                    <span className={`${styles.status} ${styles[stats.reputation.status]}`}>
-                      {stats.reputation.status === 'reliable' ? 'Reliable' : 
-                       stats.reputation.status === 'verification' ? 'Verification' : 'Under Review'}
-                    </span>
-                  </div>
-                </div>
-                
-                <div className={styles.reputationStats}>
-                  <div className={styles.statCard}>
-                    <div className={styles.statLabel}>Return Rate</div>
-                    <div className={styles.statValue}>{stats.reputation.returnRate}%</div>
-                    <div className={styles.statChange}>-0.3% from last month</div>
-                  </div>
-                  <div className={styles.statCard}>
-                    <div className={styles.statLabel}>Leads Sold</div>
-                    <div className={styles.statValue}>{stats.reputation.leadsSold}</div>
-                    <div className={styles.statChange}>+12% from last month</div>
-                  </div>
-                  <div className={styles.statCard}>
-                    <div className={styles.statLabel}>AI Rating</div>
-                    <div className={styles.statValue}>{stats.reputation.aiRating}/5</div>
-                    <div className={styles.statChange}>+0.2 from last month</div>
-                  </div>
-                </div>
-                
-                <div className={styles.nextLevel}>
-                  <h4>Next Level: {stats.reputation.nextLevel}</h4>
-                  <p>Reach 500 sold leads with less than 2% return rate to unlock premium features and higher payouts</p>
-                </div>
-              </div>
+              <NotificationPanel notifications={notifications.slice(0, 3)} />
             </>
           )}
 
@@ -985,24 +923,35 @@ const PublisherDashboard = () => {
                   value={campaigns.filter(c => c.status === 'active').length} 
                   change={5} 
                   icon={<FiLink />}
+                  color="#00F5FF"
                 />
                 <StatsCard 
                   title="Avg CTR" 
                   value="2.4%" 
                   change={1.2} 
                   icon={<FiBarChart2 />}
+                  color="#9D00FF"
+                />
+                <StatsCard 
+                  title="Avg EPC" 
+                  value={`$${1.75.toFixed(2)}`} 
+                  change={0.8} 
+                  icon={<FiTrendingUp />}
+                  color="#26DE81"
                 />
                 <StatsCard 
                   title="Total Payout" 
                   value={`$${stats.payout.toLocaleString()}`} 
                   change={stats.payoutChange} 
                   icon={<FiDollarSign />}
+                  color="#FED330"
                 />
               </section>
 
               <CampaignFilter 
                 filter={filter}
                 onFilterChange={handleFilterChange}
+                niches={niches}
               />
               
               {filteredCampaigns.length > 0 ? (
@@ -1013,6 +962,7 @@ const PublisherDashboard = () => {
                       campaign={campaign} 
                       onEdit={() => handleCampaignAction(campaign.id, 'edit')}
                       onPause={() => handleCampaignAction(campaign.id, 'pause')}
+                      onArchive={() => handleCampaignAction(campaign.id, 'archive')}
                     />
                   ))}
                 </div>
@@ -1147,183 +1097,6 @@ const PublisherDashboard = () => {
             </>
           )}
           
-          {activeTab === 'reputation' && (
-            <>
-              <div className={styles.reputationCard}>
-                <div className={styles.reputationHeader}>
-                  <div className={styles.levelInfo}>
-                    <h3>{stats.reputation.level}</h3>
-                    <p>Your current publisher level</p>
-                  </div>
-                  <div className={styles.levelStatus}>
-                    <span className={styles.levelBadge}>{stats.reputation.level}</span>
-                    <span className={`${styles.status} ${styles[stats.reputation.status]}`}>
-                      {stats.reputation.status === 'reliable' ? 'Reliable' : 
-                       stats.reputation.status === 'verification' ? 'Verification' : 'Under Review'}
-                    </span>
-                  </div>
-                </div>
-                
-                <div className={styles.reputationStats}>
-                  <div className={styles.statCard}>
-                    <div className={styles.statLabel}>Return Rate</div>
-                    <div className={styles.statValue}>{stats.reputation.returnRate}%</div>
-                    <div className={styles.statChange}>-0.3% from last month</div>
-                  </div>
-                  <div className={styles.statCard}>
-                    <div className={styles.statLabel}>Leads Sold</div>
-                    <div className={styles.statValue}>{stats.reputation.leadsSold}</div>
-                    <div className={styles.statChange}>+12% from last month</div>
-                  </div>
-                  <div className={styles.statCard}>
-                    <div className={styles.statLabel}>AI Rating</div>
-                    <div className={styles.statValue}>{stats.reputation.aiRating}/5</div>
-                    <div className={styles.statChange}>+0.2 from last month</div>
-                  </div>
-                </div>
-                
-                <div className={styles.nextLevel}>
-                  <h4>Next Level: {stats.reputation.nextLevel}</h4>
-                  <p>Reach 500 sold leads with less than 2% return rate to unlock premium features and higher payouts</p>
-                </div>
-              </div>
-              
-              <h3 className={styles.sectionTitle}>Your Badges</h3>
-              <div className={styles.badgesContainer}>
-                {stats.badges.map(badge => (
-                  <div key={badge.id} className={styles.badge}>
-                    <div className={styles.badgeIcon}>
-                      {badge.earned ? <FiAward /> : <FiAward style={{ opacity: 0.3 }} />}
-                    </div>
-                    <div className={styles.badgeInfo}>
-                      <h4>{badge.name}</h4>
-                      <p>{badge.description}</p>
-                      <span style={{ color: badge.earned ? '#26DE81' : '#FED330' }}>
-                        {badge.earned ? 'Earned' : 'Not earned'}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
-          
-          {activeTab === 'learning' && (
-            <>
-              <h3 className={styles.sectionTitle}>Recommended Courses</h3>
-              
-              {stats.courses.map(course => (
-                <div key={course.id} className={styles.courseCard}>
-                  <div className={styles.courseImage}>
-                    <FiPlay className={styles.playIcon} />
-                  </div>
-                  <div className={styles.courseContent}>
-                    <h3>{course.title}</h3>
-                    <p>{course.duration} • {course.description}</p>
-                    
-                    <div className={styles.progressBar}>
-                      <div className={styles.progress} style={{ width: `${course.progress}%` }}></div>
-                    </div>
-                    
-                    <div className={styles.progressInfo}>
-                      <span>{course.progress}% completed</span>
-                      <span>{course.duration}</span>
-                    </div>
-                    
-                    <div className={styles.courseActions}>
-                      <button className={styles.primary}>
-                        <FiPlay /> Continue
-                      </button>
-                      <button>
-                        <FiDownload /> Resources
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-              
-              <div className={styles.chartContainer}>
-                <h3>Learning Resources</h3>
-                <div className={styles.chartPlaceholder}>
-                  Video tutorials, documentation and onboarding materials
-                </div>
-              </div>
-            </>
-          )}
-          
-          {activeTab === 'referrals' && (
-            <>
-              <div className={styles.referralCard}>
-                <div className={styles.referralHeader}>
-                  <div className={styles.referralInfo}>
-                    <h3>Referral Program</h3>
-                    <p>Invite other publishers and earn <strong>+5%</strong> of their income for the first month</p>
-                  </div>
-                  <div className={styles.earningsBadge}>Earned: ${stats.referrals.reduce((sum, ref) => sum + ref.earnings, 0)}</div>
-                </div>
-                
-                <div className={styles.referralLink}>
-                  <input 
-                    type="text" 
-                    value="https://leadspace.com/join?ref=pub123" 
-                    readOnly 
-                  />
-                  <button onClick={() => copyToClipboard('https://leadspace.com/join?ref=pub123')}>
-                    <FiCopy /> Copy
-                  </button>
-                </div>
-                
-                <div className={styles.referralStats}>
-                  <div className={styles.statItem}>
-                    <div className={styles.statValue}>{stats.referrals.length}</div>
-                    <div className={styles.statLabel}>Referred</div>
-                  </div>
-                  <div className={styles.statItem}>
-                    <div className={styles.statValue}>
-                      {stats.referrals.filter(r => r.status === 'active').length}
-                    </div>
-                    <div className={styles.statLabel}>Active</div>
-                  </div>
-                  <div className={styles.statItem}>
-                    <div className={styles.statValue}>
-                      ${stats.referrals.reduce((sum, ref) => sum + ref.earnings, 0)}
-                    </div>
-                    <div className={styles.statLabel}>Earned</div>
-                  </div>
-                </div>
-              </div>
-              
-              <div className={styles.tableWrapper}>
-                <h3 className={styles.sectionTitle}>Referral History</h3>
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Name</th>
-                      <th>Date</th>
-                      <th>Earnings</th>
-                      <th>Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {stats.referrals.map(referral => (
-                      <tr key={referral.id}>
-                        <td>{referral.name}</td>
-                        <td>{referral.date}</td>
-                        <td>${referral.earnings.toFixed(2)}</td>
-                        <td>
-                          <span className={`${styles.status} ${referral.status === 'active' ? styles.active : 
-                                          referral.status === 'pending' ? styles.paused : styles.archived}`}>
-                            {referral.status}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </>
-          )}
-          
           {activeTab === 'documents' && (
             <>
               <div className={styles.tableWrapper}>
@@ -1339,23 +1112,51 @@ const PublisherDashboard = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {stats.documents.map(doc => (
-                      <tr key={doc.id}>
-                        <td>{doc.name}</td>
-                        <td>{doc.type}</td>
-                        <td>{doc.date}</td>
-                        <td>
-                          <span className={`${styles.status} ${doc.status === 'signed' ? styles.active : styles.paused}`}>
-                            {doc.status}
-                          </span>
-                        </td>
-                        <td>
-                          <button className={styles.resetButton} style={{ padding: '0.3rem 0.8rem', fontSize: '0.8rem' }}>
-                            {doc.status === 'signed' ? 'View' : 'Sign'}
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
+                    <tr>
+                      <td>Publisher Agreement</td>
+                      <td>Contract</td>
+                      <td>2023-01-15</td>
+                      <td>
+                        <span className={`${styles.status} ${styles.active}`}>
+                          signed
+                        </span>
+                      </td>
+                      <td>
+                        <button className={styles.resetButton} style={{ padding: '0.3rem 0.8rem', fontSize: '0.8rem' }}>
+                          View
+                        </button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>DPA Compliance</td>
+                      <td>Data Agreement</td>
+                      <td>2023-01-15</td>
+                      <td>
+                        <span className={`${styles.status} ${styles.active}`}>
+                          signed
+                        </span>
+                      </td>
+                      <td>
+                        <button className={styles.resetButton} style={{ padding: '0.3rem 0.8rem', fontSize: '0.8rem' }}>
+                          View
+                        </button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Exclusive Partnership</td>
+                      <td>Contract</td>
+                      <td>2023-05-20</td>
+                      <td>
+                        <span className={`${styles.status} ${styles.paused}`}>
+                          pending
+                        </span>
+                      </td>
+                      <td>
+                        <button className={styles.resetButton} style={{ padding: '0.3rem 0.8rem', fontSize: '0.8rem' }}>
+                          Sign
+                        </button>
+                      </td>
+                    </tr>
                   </tbody>
                 </table>
               </div>
@@ -1443,14 +1244,6 @@ const PublisherDashboard = () => {
                   <div className={styles.notificationItem}>
                     <input type="checkbox" id="new-campaigns" defaultChecked />
                     <label htmlFor="new-campaigns">New campaigns</label>
-                  </div>
-                  <div className={styles.notificationItem}>
-                    <input type="checkbox" id="reputation" defaultChecked />
-                    <label htmlFor="reputation">Reputation changes</label>
-                  </div>
-                  <div className={styles.notificationItem}>
-                    <input type="checkbox" id="new-courses" />
-                    <label htmlFor="new-courses">New courses</label>
                   </div>
                   <div className={styles.notificationItem}>
                     <input type="checkbox" id="promotions" />

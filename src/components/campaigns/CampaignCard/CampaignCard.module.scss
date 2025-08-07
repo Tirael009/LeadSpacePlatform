@@ -1,32 +1,64 @@
 @import '../../../assets/styles/variables.scss';
 
 .card {
-  background: rgba(15, 23, 42, 0.7);
-  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(23, 33, 56, 0.8) 100%);
+  border-radius: 16px;
   padding: 1.5rem;
-  box-shadow: 0 0 20px rgba(0, 245, 255, 0.1);
-  border: 1px solid rgba(98, 154, 219, 0.1);
-  backdrop-filter: blur(5px);
-  transition: all 0.3s ease;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  border-left: 5px solid;
+  backdrop-filter: blur(10px);
+  transition: 
+    transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+    box-shadow 0.3s ease;
+  overflow: hidden;
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      120deg,
+      rgba(255, 255, 255, 0.03) 0%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    pointer-events: none;
+  }
+  
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25);
+  }
 
   &.active {
-    border-left: 4px solid #26DE81;
+    border-left-color: #26DE81;
+    box-shadow: 
+      0 8px 16px rgba(0, 0, 0, 0.2),
+      inset 0 0 0 1px rgba(38, 222, 129, 0.1);
   }
 
   &.paused {
-    border-left: 4px solid #FED330;
+    border-left-color: #FED330;
+    box-shadow: 
+      0 8px 16px rgba(0, 0, 0, 0.2),
+      inset 0 0 0 1px rgba(254, 211, 48, 0.1);
   }
 
   &.archived {
-    border-left: 4px solid #A0AEC0;
+    border-left-color: #A0AEC0;
+    box-shadow: 
+      0 8px 16px rgba(0, 0, 0, 0.2),
+      inset 0 0 0 1px rgba(160, 174, 192, 0.1);
   }
-
-  &:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 0 30px rgba(0, 245, 255, 0.2);
+  
+  &.expanded {
+    .cardBody {
+      max-height: 500px;
+      opacity: 1;
+    }
   }
 }
 
@@ -34,42 +66,140 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.5rem;
+  margin-bottom: 1.25rem;
+}
 
+.titleContainer {
+  flex: 1;
+  min-width: 0;
+  
   h3 {
     margin: 0;
     color: #E2E8F0;
-    font-size: 1.1rem;
+    font-size: 1.15rem;
     font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding-right: 1rem;
   }
 }
 
 .status {
-  display: inline-block;
-  padding: 0.3rem 0.8rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 1rem;
   border-radius: 999px;
-  font-size: 0.7rem;
+  font-size: 0.8rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 1px;
   font-family: 'Orbitron', sans-serif;
+  margin-top: 0.5rem;
+  width: fit-content;
 
   &.active {
-    background: rgba(38, 222, 129, 0.2);
+    background: rgba(38, 222, 129, 0.15);
     color: #26DE81;
-    box-shadow: 0 0 8px rgba(38, 222, 129, 0.3);
+    box-shadow: 0 0 10px rgba(38, 222, 129, 0.2);
   }
 
   &.paused {
-    background: rgba(254, 211, 48, 0.2);
+    background: rgba(254, 211, 48, 0.15);
     color: #FED330;
-    box-shadow: 0 0 8px rgba(254, 211, 48, 0.3);
+    box-shadow: 0 0 10px rgba(254, 211, 48, 0.2);
   }
 
   &.archived {
-    background: rgba(160, 174, 192, 0.2);
+    background: rgba(160, 174, 192, 0.15);
     color: #A0AEC0;
-    box-shadow: 0 0 8px rgba(160, 174, 192, 0.3);
+    box-shadow: 0 0 10px rgba(160, 174, 192, 0.2);
+  }
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.toggleButton {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: $primary;
+  }
+}
+
+.menuContainer {
+  position: relative;
+}
+
+.menuButton {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 700;
+  font-size: 1rem;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: $primary;
+  }
+}
+
+.menuDropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: rgba(15, 23, 42, 0.95);
+  border-radius: 8px;
+  padding: 0.5rem 0;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  z-index: 10;
+  margin-top: 0.5rem;
+  min-width: 200px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(98, 154, 219, 0.2);
+  animation: fadeIn 0.2s ease;
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: transparent;
+  border: none;
+  text-align: left;
+  color: #e2e8f0;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: $primary;
   }
 }
 
@@ -77,6 +207,9 @@
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  transition: all 0.4s ease;
+  max-height: 300px;
+  overflow: hidden;
 }
 
 .metricRow {
@@ -87,30 +220,45 @@
 
 .metric {
   display: flex;
-  flex-direction: column;
   align-items: center;
+  gap: 0.75rem;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.8rem;
+  border-radius: 8px;
+}
 
-  .metricLabel {
-    color: #A0AEC0;
-    font-size: 0.8rem;
-    margin-bottom: 0.3rem;
-  }
+.metricIcon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: rgba(0, 245, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $primary;
+  flex-shrink: 0;
+}
 
-  .metricValue {
-    color: #E2E8F0;
-    font-size: 1.1rem;
-    font-weight: 600;
-    font-family: 'Orbitron', sans-serif;
-  }
+.metricLabel {
+  color: #94a3b8;
+  font-size: 0.85rem;
+  margin-bottom: 0.15rem;
+}
+
+.metricValue {
+  color: #E2E8F0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  font-family: 'Orbitron', sans-serif;
 }
 
 .revenueRow {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 1rem;
-  background: rgba(0, 245, 255, 0.05);
-  padding: 1rem;
-  border-radius: 6px;
+  background: rgba(0, 245, 255, 0.08);
+  padding: 1.25rem;
+  border-radius: 12px;
   border: 1px dashed rgba(0, 245, 255, 0.2);
 }
 
@@ -118,86 +266,106 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+}
 
-  .revenueLabel {
-    color: #A0AEC0;
-    font-size: 0.8rem;
-    margin-bottom: 0.3rem;
-  }
+.revenueLabel {
+  color: #94a3b8;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
 
-  .revenueValue {
-    color: #00F5FF;
-    font-size: 1.2rem;
-    font-weight: 600;
-    font-family: 'Orbitron', sans-serif;
-  }
+.revenueValue {
+  color: $primary;
+  font-size: 1.3rem;
+  font-weight: 700;
+  font-family: 'Orbitron', sans-serif;
+  letter-spacing: -0.5px;
 }
 
 .dates {
   display: flex;
   justify-content: space-between;
+  font-size: 0.9rem;
+  color: #94a3b8;
+  gap: 1rem;
+  
+  > div {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 0.8rem;
+    border-radius: 8px;
+    text-align: center;
+  }
+}
+
+.dateLabel {
   font-size: 0.8rem;
-  color: #A0AEC0;
+  margin-bottom: 0.25rem;
 }
 
-.cardFooter {
+.dateValue {
+  color: #e2e8f0;
+  font-weight: 500;
+}
+
+.details {
   display: flex;
-  gap: 0.5rem;
+  flex-direction: column;
+  gap: 0.75rem;
   margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px dashed rgba(98, 154, 219, 0.3);
+}
 
-  button {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    border-radius: 6px;
-    font-size: 0.8rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    border: none;
-    font-family: 'Orbitron', sans-serif;
-    letter-spacing: 1px;
-
-    &:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 0 10px rgba(0, 245, 255, 0.3);
-    }
+.detailRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  
+  span:first-child {
+    color: #94a3b8;
+    min-width: 120px;
   }
 }
 
-.pauseButton {
-  background: rgba(254, 211, 48, 0.2);
-  color: #FED330;
-
-  &:hover {
-    background: rgba(254, 211, 48, 0.3);
-  }
+.detailValue {
+  color: #e2e8f0;
+  text-align: right;
+  max-width: 70%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.playButton {
-  background: rgba(38, 222, 129, 0.2);
-  color: #26DE81;
-
-  &:hover {
-    background: rgba(38, 222, 129, 0.3);
-  }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-.editButton {
-  background: rgba(0, 245, 255, 0.2);
-  color: #00F5FF;
-
-  &:hover {
-    background: rgba(0, 245, 255, 0.3);
+@media (max-width: 768px) {
+  .card {
+    padding: 1.25rem;
   }
-}
-
-.archiveButton {
-  background: rgba(160, 174, 192, 0.2);
-  color: #A0AEC0;
-
-  &:hover {
-    background: rgba(160, 174, 192, 0.3);
+  
+  .cardHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .actions {
+    align-self: flex-end;
+  }
+  
+  .metricRow {
+    grid-template-columns: 1fr;
+  }
+  
+  .revenueRow {
+    grid-template-columns: 1fr;
+  }
+  
+  .dates {
+    flex-direction: column;
   }
 }

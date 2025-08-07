@@ -28,6 +28,22 @@
   }
 }
 
+.exclusiveBadge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: rgba(38, 222, 129, 0.2);
+  color: #26DE81;
+  padding: 0.3rem 0.7rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  z-index: 1;
+}
+
 .leadHeader {
   display: flex;
   justify-content: space-between;
@@ -156,6 +172,11 @@
       &.vip {
         background: rgba(255, 184, 0, 0.2);
         color: #FFB800;
+      }
+      
+      &.hot {
+        background: rgba(255, 71, 87, 0.2);
+        color: #FF4757;
       }
     }
   }

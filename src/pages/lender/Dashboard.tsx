@@ -35,7 +35,9 @@ import {
   FiEye,
   FiDollarSign,
   FiCheck,
-  FiAlertCircle
+  FiAlertCircle,
+  FiActivity,
+  FiPercent
 } from 'react-icons/fi';
 import StatsCard from '../../components/ui/StatsCard/StatsCard';
 import NotificationPanel from '../../components/ui/NotificationPanel/NotificationPanel';
@@ -79,6 +81,7 @@ interface MarketplaceLead {
   creditScore?: number;
   loanAmount?: number;
   urgency?: number;
+  isExclusive?: boolean;
 }
 
 interface Payment {
@@ -118,6 +121,9 @@ interface Stats {
   spentToday: number;
   leadsToday: number;
   roi: number;
+  avgLeadPrice: number;
+  bestSource: string;
+  refundRate: number;
 }
 
 interface Filter {
@@ -134,6 +140,14 @@ interface AISetting {
   description: string;
   type: 'toggle' | 'slider' | 'select';
   options?: string[];
+}
+
+interface Purchase {
+  id: string;
+  date: string;
+  leads: MarketplaceLead[];
+  totalAmount: number;
+  status: 'completed' | 'pending' | 'failed';
 }
 
 const LenderDashboard = () => {
@@ -167,7 +181,10 @@ const LenderDashboard = () => {
     weeklyBudget: 1500,
     spentToday: 85,
     leadsToday: 7,
-    roi: 42
+    roi: 42,
+    avgLeadPrice: 75,
+    bestSource: 'Google Ads',
+    refundRate: 2.5
   });
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -184,10 +201,16 @@ const LenderDashboard = () => {
     minIncome: 0,
     age: '',
     uniqueness: 'all',
-    period: 'today'
+    period: 'today',
+    minCreditScore: 0,
+    maxCreditScore: 850,
+    minUrgency: 0,
+    maxUrgency: 10,
+    salesCount: 'all'
   });
   const [savedFilters, setSavedFilters] = useState<Filter[]>([]);
   const [aiSettings, setAiSettings] = useState<AISetting[]>([]);
+  const [purchaseHistory, setPurchaseHistory] = useState<Purchase[]>([]);
   
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [balanceHistoryOpen, setBalanceHistoryOpen] = useState(false);
@@ -197,6 +220,7 @@ const LenderDashboard = () => {
   const [auctionNotification] = useState(true);
   const [cartOpen, setCartOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [supportChatOpen, setSupportChatOpen] = useState(false);
   
   const cartRef = useRef<HTMLDivElement>(null);
   
@@ -234,7 +258,8 @@ const LenderDashboard = () => {
         age: 32,
         creditScore: 780,
         loanAmount: 10500000,
-        urgency: 9
+        urgency: 9,
+        isExclusive: true
       },
       {
         id: 'm2',
@@ -302,7 +327,8 @@ const LenderDashboard = () => {
         age: 29,
         creditScore: 820,
         loanAmount: 8000000,
-        urgency: 8
+        urgency: 8,
+        isExclusive: true
       },
       {
         id: 'm6',
@@ -403,6 +429,9 @@ const LenderDashboard = () => {
       spentToday: 85,
       leadsToday: 7,
       roi: 42,
+      avgLeadPrice: 75,
+      bestSource: 'Google Ads',
+      refundRate: 2.5,
       recentPayments: [
         { 
           id: '1', 
@@ -554,6 +583,30 @@ const LenderDashboard = () => {
       }
     ];
 
+    const mockPurchaseHistory: Purchase[] = [
+      {
+        id: 'p1',
+        date: '2023-06-15',
+        leads: [mockMarketplaceLeads[0], mockMarketplaceLeads[1]],
+        totalAmount: 150,
+        status: 'completed'
+      },
+      {
+        id: 'p2',
+        date: '2023-06-10',
+        leads: [mockMarketplaceLeads[2], mockMarketplaceLeads[3]],
+        totalAmount: 130,
+        status: 'completed'
+      },
+      {
+        id: 'p3',
+        date: '2023-06-05',
+        leads: [mockMarketplaceLeads[4]],
+        totalAmount: 120,
+        status: 'completed'
+      }
+    ];
+
     const fetchData = async () => {
       try {
         setIsLoading(true);
@@ -565,6 +618,7 @@ const LenderDashboard = () => {
         setNotifications(mockNotifications);
         setSavedFilters(mockSavedFilters);
         setAiSettings(mockAiSettings);
+        setPurchaseHistory(mockPurchaseHistory);
         setUnreadCount(mockNotifications.filter(n => !n.read).length);
       } catch (error) {
         console.error('Error loading data:', error);
@@ -608,7 +662,15 @@ const LenderDashboard = () => {
       (!marketplaceFilters.age || 
         (marketplaceFilters.age === 'under30' && lead.age < 30) ||
         (marketplaceFilters.age === '30-50' && lead.age >= 30 && lead.age <= 50) ||
-        (marketplaceFilters.age === 'over50' && lead.age > 50))
+        (marketplaceFilters.age === 'over50' && lead.age > 50)) &&
+      lead.creditScore !== undefined && 
+        lead.creditScore >= marketplaceFilters.minCreditScore && 
+        lead.creditScore <= marketplaceFilters.maxCreditScore &&
+      lead.urgency !== undefined && 
+        lead.urgency >= marketplaceFilters.minUrgency && 
+        lead.urgency <= marketplaceFilters.maxUrgency &&
+      (marketplaceFilters.salesCount === 'all' || 
+        (marketplaceFilters.salesCount === 'exclusive' && lead.salesCount === 0))
     );
   });
 
@@ -647,6 +709,18 @@ const LenderDashboard = () => {
       setNotifications(prev => [newNotification, ...prev]);
       setUnreadCount(prev => prev + 1);
       
+      // Добавляем покупку в историю
+      const purchasedLeads = cart.map(id => marketplaceLeads.find(lead => lead.id === id)).filter(Boolean) as MarketplaceLead[];
+      const newPurchase: Purchase = {
+        id: `p${purchaseHistory.length + 1}`,
+        date: new Date().toISOString().split('T')[0],
+        leads: purchasedLeads,
+        totalAmount: totalCost,
+        status: 'completed'
+      };
+      
+      setPurchaseHistory(prev => [newPurchase, ...prev]);
+      
       setCart([]);
       setCartOpen(false);
       
@@ -667,7 +741,7 @@ const LenderDashboard = () => {
     }
   };
 
-  const markNotificationAsRead = (id: string) => {
+  const _markNotificationAsRead = (id: string) => {
     setNotifications(prev => 
       prev.map(n => n.id === id ? { ...n, read: true } : n)
     );
@@ -683,6 +757,8 @@ const LenderDashboard = () => {
       alert('Запрос вывода средств...');
     } else if (action === 'top_up') {
       topUpBalance(500);
+    } else if (action === 'open_support') {
+      setSupportChatOpen(true);
     }
   };
 
@@ -772,6 +848,16 @@ const LenderDashboard = () => {
 
   const cartItems = cart.map(id => marketplaceLeads.find(lead => lead.id === id)).filter(Boolean);
 
+  const onboardingText = {
+    'leads_marketplace': 'Здесь вы можете покупать лиды по заданным критериям. Используйте фильтры для поиска наиболее релевантных заявок.',
+    'my_leads': 'Управляйте приобретенными лидами. Отмечайте статусы обработки и отслеживайте конверсию.',
+    'analytics': 'Анализируйте эффективность ваших инвестиций. Отслеживайте ROI и ключевые метрики.',
+    'balance': 'Управляйте балансом, платежами и настройками бюджета.',
+    'filters': 'Создавайте и управляйте сохраненными фильтрами для быстрого доступа к нужным лидам.',
+    'settings': 'Настройте параметры вашего аккаунта и интеграции.',
+    'ai_manager': 'Настройте AI-ассистента для автоматической покупки лидов по вашим критериям.'
+  };
+
   return (
     <div className={`${styles.dashboard} ${sidebarOpen ? styles.sidebarOpen : ''}`}>
       <div className={styles.topNav}>
@@ -794,17 +880,6 @@ const LenderDashboard = () => {
         </div>
         
         <div className={styles.navControls}>
-          {auctionNotification && (
-            <button 
-              className={styles.auctionButton}
-              onClick={() => setActiveTab('leads_marketplace')}
-            >
-              <span className={styles.fireIcon}>🔥</span>
-              <span className={styles.auctionText}>Идёт аукцион на 3 лида!</span>
-              <span className={styles.countdown}>12:45</span>
-            </button>
-          )}
-          
           <button 
             className={styles.notificationButton}
             onClick={(e) => {
@@ -944,7 +1019,7 @@ const LenderDashboard = () => {
                     </button>
                   </li>
                   <li>
-                    <button>
+                    <button onClick={() => handleQuickAction('open_support')}>
                       <FiMessageSquare /> Онлайн-чат
                     </button>
                   </li>
@@ -1071,17 +1146,13 @@ const LenderDashboard = () => {
           <FiX />
         </button>
         
-        <div className={styles.userInfoSidebar}>
-          <img 
-            src={user?.avatar || 'https://i.pravatar.cc/300'} 
-            alt="User" 
-            className={styles.avatarSidebar}
-          />
-          <div>
-            <div className={styles.userName}>{user?.firstName} {user?.lastName}</div>
-            <div className={styles.userCompany}>{user?.company || 'Premium Lender'}</div>
-          </div>
-        </div>
+        <button 
+          className={styles.supportButton}
+          onClick={() => setSupportChatOpen(true)}
+        >
+          <FiMessageSquare />
+          <span>Поддержка</span>
+        </button>
         
         <nav className={styles.primaryNav}>
           <ul>
@@ -1089,6 +1160,9 @@ const LenderDashboard = () => {
               <button onClick={() => setActiveTab('leads_marketplace')}>
                 <FiShoppingBag />
                 <span>Магазин лидов</span>
+                {auctionNotification && (
+                  <span className={styles.auctionBadge}>🔥</span>
+                )}
                 {activeTab === 'leads_marketplace' && <div className={styles.activeIndicator}></div>}
               </button>
             </li>
@@ -1164,7 +1238,7 @@ const LenderDashboard = () => {
             </li>
             <li>
               <button>
-                <FiShoppingCart />
+                <FiShoppingBag />
                 <span>История покупок</span>
               </button>
             </li>
@@ -1198,13 +1272,7 @@ const LenderDashboard = () => {
               {activeTab === 'ai_manager' && 'AI-менеджер'}
             </h1>
             <p>
-              {activeTab === 'leads_marketplace' && 'Покупайте качественные лиды для вашего бизнеса'}
-              {activeTab === 'my_leads' && `Управляйте вашими ${leads.length} приобретенными лидами`}
-              {activeTab === 'analytics' && 'Анализируйте эффективность ваших инвестиций'}
-              {activeTab === 'balance' && `Управляйте балансом: $${stats.balance}`}
-              {activeTab === 'filters' && `Управляйте ${savedFilters.length} сохраненными фильтрами`}
-              {activeTab === 'settings' && 'Настройте параметры вашего аккаунта'}
-              {activeTab === 'ai_manager' && 'Настройте вашего AI-ассистента'}
+              {onboardingText[activeTab]}
             </p>
           </div>
           
@@ -1213,7 +1281,8 @@ const LenderDashboard = () => {
               actions={[
                 { icon: <FiPlus />, label: 'Добавить лид', action: 'add_lead' },
                 { icon: <FiTrendingUp />, label: 'Создать отчет', action: 'new_report' },
-                { icon: <FiDollarSign />, label: 'Пополнить баланс', action: 'top_up' }
+                { icon: <FiDollarSign />, label: 'Пополнить баланс', action: 'top_up' },
+                { icon: <FiMessageSquare />, label: 'Поддержка', action: 'open_support' }
               ]} 
               onAction={handleQuickAction}
             />
@@ -1223,7 +1292,6 @@ const LenderDashboard = () => {
         {notificationPanelOpen && (
           <NotificationPanel 
             notifications={notifications}
-            onMarkAsRead={markNotificationAsRead}
             onClose={() => setNotificationPanelOpen(false)}
           />
         )}
@@ -1238,6 +1306,11 @@ const LenderDashboard = () => {
             <>
               {activeTab === 'leads_marketplace' && (
                 <div className={styles.marketplaceContainer}>
+                  <div className={styles.welcomeBlock}>
+                    <h2>Добро пожаловать в LeadSpace!</h2>
+                    <p>Ваш центр для покупки и управления лидами. Используйте фильтры, AI и аналитику, чтобы найти нужных клиентов.</p>
+                  </div>
+                  
                   <div className={styles.marketplaceHeader}>
                     <div className={styles.statsRow}>
                       <StatsCard 
@@ -1253,20 +1326,21 @@ const LenderDashboard = () => {
                         change={-5}
                       />
                       <StatsCard 
-                        icon={<FiTrendingUp />}
+                        icon={<FiPercent />}
                         title="ROI"
                         value={`${stats.roi}%`}
                         change={3}
                       />
                       <StatsCard 
-                        icon={<FiCreditCard />}
-                        title="Баланс"
-                        value={`$${stats.balance}`}
-                        change={0}
+                        icon={<FiActivity />}
+                        title="Средняя цена"
+                        value={`$${stats.avgLeadPrice}`}
+                        change={2}
                       />
                     </div>
 
                     <div className={styles.marketplaceActions}>
+                      
                       <button 
                         className={classNames(styles.cartButton, cart.length > 0 && styles.hasItems)}
                         onClick={() => setCartOpen(!cartOpen)}
@@ -1433,6 +1507,59 @@ const LenderDashboard = () => {
                           <option value="over50">Старше 50</option>
                         </select>
                       </div>
+                      
+                      <div className={styles.filterGroup}>
+                        <label>Кредитный рейтинг</label>
+                        <div className={styles.rangeInputs}>
+                          <input 
+                            type="number" 
+                            min="0" 
+                            max="850" 
+                            value={marketplaceFilters.minCreditScore}
+                            onChange={(e) => setMarketplaceFilters({...marketplaceFilters, minCreditScore: parseInt(e.target.value) || 0})}
+                          />
+                          <span>-</span>
+                          <input 
+                            type="number" 
+                            min="0" 
+                            max="850" 
+                            value={marketplaceFilters.maxCreditScore}
+                            onChange={(e) => setMarketplaceFilters({...marketplaceFilters, maxCreditScore: parseInt(e.target.value) || 850})}
+                          />
+                        </div>
+                      </div>
+                      
+                      <div className={styles.filterGroup}>
+                        <label>Срочность</label>
+                        <div className={styles.rangeInputs}>
+                          <input 
+                            type="number" 
+                            min="0" 
+                            max="10" 
+                            value={marketplaceFilters.minUrgency}
+                            onChange={(e) => setMarketplaceFilters({...marketplaceFilters, minUrgency: parseInt(e.target.value) || 0})}
+                          />
+                          <span>-</span>
+                          <input 
+                            type="number" 
+                            min="0" 
+                            max="10" 
+                            value={marketplaceFilters.maxUrgency}
+                            onChange={(e) => setMarketplaceFilters({...marketplaceFilters, maxUrgency: parseInt(e.target.value) || 10})}
+                          />
+                        </div>
+                      </div>
+                      
+                      <div className={styles.filterGroup}>
+                        <label>Эксклюзивность</label>
+                        <select 
+                          value={marketplaceFilters.salesCount}
+                          onChange={(e) => setMarketplaceFilters({...marketplaceFilters, salesCount: e.target.value})}
+                        >
+                          <option value="all">Все лиды</option>
+                          <option value="exclusive">Только эксклюзивные</option>
+                        </select>
+                      </div>
                     </div>
                     <div className={styles.filterActions}>
                       <button className={styles.resetButton}>
@@ -1590,7 +1717,7 @@ const LenderDashboard = () => {
                       change={stats.revenueChange}
                     />
                     <StatsCard 
-                      icon={<FiCreditCard />}
+                      icon={<FiActivity />}
                       title="ROI"
                       value={`${stats.roi}%`}
                       change={3}
@@ -1710,6 +1837,40 @@ const LenderDashboard = () => {
                   <div className={styles.paymentHistory}>
                     <h3>История платежей</h3>
                     <PaymentHistory payments={stats.recentPayments} />
+                  </div>
+                  
+                  <div className={styles.purchaseHistory}>
+                    <h3>История покупок лидов</h3>
+                    <table className={styles.purchaseTable}>
+                      <thead>
+                        <tr>
+                          <th>Дата</th>
+                          <th>Кол-во лидов</th>
+                          <th>Сумма</th>
+                          <th>Статус</th>
+                          <th>Действия</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {purchaseHistory.map(purchase => (
+                          <tr key={purchase.id}>
+                            <td>{purchase.date}</td>
+                            <td>{purchase.leads.length}</td>
+                            <td>${purchase.totalAmount}</td>
+                            <td>
+                              <span className={`${styles.statusBadge} ${purchase.status === 'completed' ? styles.completed : styles.pending}`}>
+                                {purchase.status === 'completed' ? 'Завершено' : 'Ожидание'}
+                              </span>
+                            </td>
+                            <td>
+                              <button className={styles.detailsButton}>
+                                <FiEye /> Подробности
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
 
                   <div className={styles.invoiceSection}>
@@ -1921,10 +2082,134 @@ const LenderDashboard = () => {
                   </div>
                 </div>
               )}
+              
+              {activeTab === 'settings' && (
+                <div className={styles.settingsContainer}>
+                  <div className={styles.settingsSection}>
+                    <h3>Интеграции</h3>
+                    <div className={styles.integrationsGrid}>
+                      <div className={styles.integrationCard}>
+                        <div className={styles.integrationHeader}>
+                          <FiCode className={styles.integrationIcon} />
+                          <h4>API & Webhooks</h4>
+                        </div>
+                        <p>Настройте интеграцию с вашей CRM системой через API</p>
+                        <button className={styles.configureButton}>
+                          Настроить
+                        </button>
+                      </div>
+                      
+                      <div className={styles.integrationCard}>
+                        <div className={styles.integrationHeader}>
+                          <FiDatabase className={styles.integrationIcon} />
+                          <h4>Экспорт данных</h4>
+                        </div>
+                        <p>Настройте автоматический экспорт лидов в нужном формате</p>
+                        <button className={styles.configureButton}>
+                          Настроить
+                        </button>
+                      </div>
+                      
+                      <div className={styles.integrationCard}>
+                        <div className={styles.integrationHeader}>
+                          <FiActivity className={styles.integrationIcon} />
+                          <h4>Аналитика</h4>
+                        </div>
+                        <p>Интеграция с Google Analytics и другими аналитическими системами</p>
+                        <button className={styles.configureButton}>
+                          Настроить
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className={styles.settingsSection}>
+                    <h3>Настройки уведомлений</h3>
+                    <div className={styles.notificationSettings}>
+                      <div className={styles.settingItem}>
+                        <label>
+                          <input type="checkbox" defaultChecked />
+                          <span>Уведомления о новых лидах</span>
+                        </label>
+                      </div>
+                      <div className={styles.settingItem}>
+                        <label>
+                          <input type="checkbox" defaultChecked />
+                          <span>Уведомления о пополнении баланса</span>
+                        </label>
+                      </div>
+                      <div className={styles.settingItem}>
+                        <label>
+                          <input type="checkbox" defaultChecked />
+                          <span>Уведомления о достижении лимитов</span>
+                        </label>
+                      </div>
+                      <div className={styles.settingItem}>
+                        <label>
+                          <input type="checkbox" />
+                          <span>Ежедневные отчеты</span>
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className={styles.settingsSection}>
+                    <h3>Безопасность</h3>
+                    <div className={styles.securitySettings}>
+                      <div className={styles.securityItem}>
+                        <div>
+                          <h4>Двухфакторная аутентификация</h4>
+                          <p>Добавьте дополнительный уровень безопасности к вашему аккаунту</p>
+                        </div>
+                        <button className={styles.enableButton}>
+                          Включить
+                        </button>
+                      </div>
+                      
+                      <div className={styles.securityItem}>
+                        <div>
+                          <h4>История входов</h4>
+                          <p>Последние действия в вашем аккаунте</p>
+                        </div>
+                        <button className={styles.viewButton}>
+                          Просмотреть
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </>
           )}
         </div>
       </main>
+      
+      {supportChatOpen && (
+        <div className={styles.supportChat}>
+          <div className={styles.chatHeader}>
+            <h3>Чат поддержки</h3>
+            <button onClick={() => setSupportChatOpen(false)}>
+              <FiX />
+            </button>
+          </div>
+          <div className={styles.chatMessages}>
+            <div className={styles.message}>
+              <div className={styles.avatar}>S</div>
+              <div className={styles.content}>
+                <div className={styles.name}>Поддержка LeadSpace</div>
+                <div className={styles.text}>Здравствуйте! Чем могу помочь?</div>
+                <div className={styles.time}>Сейчас</div>
+              </div>
+            </div>
+          </div>
+          <div className={styles.chatInput}>
+            <input type="text" placeholder="Введите сообщение..." />
+            <button>
+              <FiMessageSquare />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

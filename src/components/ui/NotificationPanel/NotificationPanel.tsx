@@ -1,5 +1,12 @@
 import React from 'react';
 import styles from './NotificationPanel.module.scss';
+import { 
+  FiInfo, 
+  FiAlertTriangle, 
+  FiCheckCircle, 
+  FiXCircle,
+  FiBell
+} from 'react-icons/fi';
 
 interface Notification {
   id: string;
@@ -7,30 +14,41 @@ interface Notification {
   message: string;
   time: string;
   read: boolean;
+  action?: () => void;
 }
 
-interface Props {
+interface NotificationPanelProps {
   notifications: Notification[];
-  onMarkAsRead: (id: string) => void;
-  onClose: () => void;
+  onClose?: () => void;
 }
 
-const NotificationPanel: React.FC<Props> = ({ notifications, onMarkAsRead, onClose }) => {
+const NotificationPanel: React.FC<NotificationPanelProps> = ({ notifications }) => {
   return (
     <div className={styles.panel}>
       <div className={styles.header}>
-        <h3>Notifications</h3>
-        <button onClick={onClose}>×</button>
+        <h3>
+          <FiBell className={styles.bellIcon} />
+          Important Notifications
+        </h3>
       </div>
+      
       <div className={styles.notificationList}>
         {notifications.map(notification => (
           <div 
             key={notification.id} 
-            className={`${styles.notification} ${styles[notification.type]} ${notification.read ? styles.read : ''}`}
-            onClick={() => onMarkAsRead(notification.id)}
+            className={`${styles.notificationItem} ${notification.read ? '' : styles.unread}`}
+            onClick={notification.action}
           >
-            <p>{notification.message}</p>
-            <span>{notification.time}</span>
+            <div className={styles.notificationIcon}>
+              {notification.type === 'info' && <FiInfo className={styles.info} />}
+              {notification.type === 'warning' && <FiAlertTriangle className={styles.warning} />}
+              {notification.type === 'success' && <FiCheckCircle className={styles.success} />}
+              {notification.type === 'error' && <FiXCircle className={styles.error} />}
+            </div>
+            <div className={styles.notificationContent}>
+              <p>{notification.message}</p>
+              <span>{notification.time}</span>
+            </div>
           </div>
         ))}
       </div>

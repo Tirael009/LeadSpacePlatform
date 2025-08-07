@@ -6,7 +6,8 @@ import {
   FiDollarSign,
   FiUser,
   FiTrendingUp,
-  FiStar
+  FiStar,
+  FiInfo
 } from 'react-icons/fi';
 import styles from './LeadCard.module.scss';
 
@@ -24,7 +25,9 @@ export interface Lead {
   age?: number;
   creditScore?: number;
   loanAmount?: number;
+  urgency?: number;
   isFavorite?: boolean;
+  isExclusive?: boolean;
 }
 
 interface LeadCardProps {
@@ -42,6 +45,12 @@ const LeadCard: React.FC<LeadCardProps> = ({
 }) => {
   return (
     <div className={styles.leadCard}>
+      {lead.isExclusive && (
+        <div className={styles.exclusiveBadge}>
+          <FiInfo /> Эксклюзивный лид
+        </div>
+      )}
+      
       <div className={styles.leadHeader}>
         <div className={styles.leadType}>{lead.type}</div>
         <div className={styles.aiScore}>
@@ -82,6 +91,12 @@ const LeadCard: React.FC<LeadCardProps> = ({
             <span>Кредитный рейтинг: {lead.creditScore}</span>
           </div>
         )}
+        {lead.urgency !== undefined && (
+          <div className={styles.metaItem}>
+            <FiInfo />
+            <span>Срочность: {lead.urgency}/10</span>
+          </div>
+        )}
       </div>
       
       <div className={styles.leadDescription}>
@@ -101,7 +116,8 @@ const LeadCard: React.FC<LeadCardProps> = ({
                 badge === 'premium' ? styles.premium : 
                 badge === 'unique' ? styles.unique : 
                 badge === 'new' ? styles.new : 
-                badge === 'vip' ? styles.vip : ''
+                badge === 'vip' ? styles.vip : 
+                badge === 'hot' ? styles.hot : ''
               }`}
             >
               {badge}
@@ -113,7 +129,7 @@ const LeadCard: React.FC<LeadCardProps> = ({
           {onToggleFavorite && (
             <button 
               className={`${styles.favoriteButton} ${lead.isFavorite ? styles.active : ''}`}
-              onClick={() => onToggleFavorite(lead.id)}
+              onClick={() => onToggleFavorite?.(lead.id)}
             >
               <FiStar />
             </button>

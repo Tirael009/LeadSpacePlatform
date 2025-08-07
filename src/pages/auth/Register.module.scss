@@ -6,15 +6,42 @@
 
 .registerCard {
   @extend .loginCard;
-  max-width: 500px;
+  max-width: 620px;
+  padding: 45px;
+  
+  @media (max-width: 768px) {
+    padding: 35px;
+  }
   
   @media (max-width: 480px) {
-    padding: 20px 16px;
+    padding: 24px 16px;
   }
 }
 
 .registerHeader {
   @extend .loginHeader;
+  
+  .title {
+    @extend .title;
+    font-size: 38px;
+    margin-bottom: 15px;
+    
+    @media (max-width: 768px) {
+      font-size: 34px;
+    }
+    @media (max-width: 480px) {
+      font-size: 30px;
+    }
+  }
+  
+  .subtitle {
+    @extend .subtitle;
+    font-size: 17px;
+    
+    @media (max-width: 480px) {
+      font-size: 15px;
+    }
+  }
 }
 
 .userTypeToggle {
@@ -23,11 +50,19 @@
 
 .registerForm {
   @extend .loginForm;
-  gap: 14px;
+  gap: 24px;
 }
 
 .inputGroup {
   @extend .inputGroup;
+  
+  .inputLabel {
+    @extend .inputLabel;
+  }
+  
+  .inputField {
+    @extend .inputField;
+  }
 }
 
 .passwordWrapper {
@@ -40,54 +75,242 @@
 
 .registerButton {
   @extend .loginButton;
+  padding: 17px 0;
+  font-size: 17px;
+  
+  @media (max-width: 480px) {
+    padding: 16px 0;
+  }
 }
 
 .errorMessage {
   @extend .errorMessage;
-  margin: -6px 0 6px;
+  text-align: left;
+  padding-left: 4px;
 }
 
 .loginPrompt {
   @extend .signupPrompt;
+  margin-top: 28px;
+  font-size: 16px;
+  
+  a {
+    font-weight: 600;
+  }
 }
 
 .twoColumns {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 14px;
-
-  @media (max-width: 600px) {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
+  gap: 24px;
   
-  @media (max-width: 480px) {
-    gap: 10px;
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+    gap: 20px;
   }
 }
 
-// Дополнительные стили для чекбокса в регистрации
 .termsCheckbox {
   display: flex;
   align-items: flex-start;
-  gap: 8px;
-  font-size: 13px;
-  color: #aaa;
-  margin-top: 8px;
+  gap: 12px;
+  font-size: 15px;
+  color: #b0b3ff;
+  margin-top: 12px;
+  line-height: 1.6;
   
   input {
-    margin-top: 3px;
-    accent-color: #5b5ef3;
+    margin-top: 5px;
+    accent-color: #6a6df3;
   }
   
   a {
-    color: #6f8aff;
+    color: #8499ff;
     text-decoration: none;
     transition: color 0.2s ease;
+    font-weight: 500;
     
     &:hover {
       text-decoration: underline;
-      color: #5b5ef3;
+      color: #6a6df3;
+    }
+  }
+}
+
+.selectWrapper {
+  position: relative;
+  
+  select {
+    appearance: none;
+    padding-right: 50px;
+    cursor: pointer;
+  }
+  
+  .selectArrow {
+    position: absolute;
+    right: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #8a8dff;
+    pointer-events: none;
+    font-size: 20px;
+  }
+}
+
+.inputHint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #8a8dff;
+  margin-top: 8px;
+  font-style: italic;
+  
+  svg {
+    flex-shrink: 0;
+    color: #6c6ff5;
+  }
+}
+
+.checkboxGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 16px;
+  margin-top: 14px;
+  
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.checkboxOption {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  color: #d0d2f3;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 14px 18px;
+  border-radius: 14px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  border: 1px solid transparent;
+  
+  &:hover {
+    background: rgba(107, 111, 245, 0.15);
+  }
+  
+  input {
+    accent-color: #6a6df3;
+  }
+  
+  &.active {
+    background: rgba(107, 111, 245, 0.2);
+    border-color: rgba(107, 111, 245, 0.4);
+  }
+}
+
+.socialAuth {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin: 28px 0;
+}
+
+.socialButton {
+  @extend .socialButton;
+}
+
+.googleButton {
+  color: #e2e8f0;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.15);
+  }
+}
+
+.linkedinButton {
+  color: #e2e8f0;
+  
+  &:hover {
+    background: rgba(10, 102, 194, 0.15);
+    border-color: rgba(10, 102, 194, 0.3);
+  }
+}
+
+.authDivider {
+  position: relative;
+  text-align: center;
+  margin: 16px 0;
+  color: #8a8dff;
+  font-size: 15px;
+  
+  &:before, &:after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 42%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(138, 141, 255, 0.3), transparent);
+  }
+  
+  &:before {
+    left: 0;
+  }
+  
+  &:after {
+    right: 0;
+  }
+}
+
+.spinner {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.sectionTitle {
+  font-size: 20px;
+  font-weight: 600;
+  color: #e2e8f0;
+  margin: 28px 0 18px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(138, 141, 255, 0.2);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  
+  svg {
+    color: #8a8dff;
+  }
+}
+
+.securitySection {
+  background: rgba(15, 23, 42, 0.3);
+  border-radius: 18px;
+  padding: 22px;
+  margin-top: 22px;
+  border: 1px solid rgba(107, 111, 245, 0.2);
+  
+  .securityBadge {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #b0b3ff;
+    font-size: 15px;
+    margin-top: 12px;
+    
+    svg {
+      color: #6c6ff5;
     }
   }
 }

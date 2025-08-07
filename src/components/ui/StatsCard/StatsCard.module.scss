@@ -1,68 +1,172 @@
-// src/components/ui/StatsCard.module.scss
+@import '../../../assets/styles/variables.scss';
+
 .card {
-  background-color: white;
-  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(23, 33, 56, 0.8) 100%);
+  border-radius: 16px;
   padding: 1.5rem;
   display: flex;
   align-items: center;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 
+    0 8px 16px rgba(0, 0, 0, 0.2),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  transition: 
+    transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+    box-shadow 0.3s ease;
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(98, 154, 219, 0.15);
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      120deg,
+      rgba(255, 255, 255, 0.03) 0%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    pointer-events: none;
+  }
 
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    transform: translateY(-5px);
+    box-shadow: 
+      0 12px 24px rgba(0, 0, 0, 0.25),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+  }
+
+  &.loading {
+    .content > * {
+      background: linear-gradient(90deg, #1e293b 25%, #2d3748 50%, #1e293b 75%);
+      background-size: 200% 100%;
+      border-radius: 4px;
+      color: transparent !important;
+      animation: loading 1.5s infinite;
+    }
+    
+    .iconContainer {
+      background: linear-gradient(90deg, #1e293b 25%, #2d3748 50%, #1e293b 75%);
+      background-size: 200% 100%;
+      animation: loading 1.5s infinite;
+    }
   }
 }
 
 .iconContainer {
-  width: 48px;
-  height: 48px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
-  background-color: #ebf8ff;
+  background: linear-gradient(135deg, #0f1a2f 0%, #1a2b45 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 1.25rem;
-  color: #3182ce;
+  margin-right: 1.5rem;
+  box-shadow: 
+    0 4px 6px rgba(0, 0, 0, 0.1),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.2),
+    inset 0 2px 4px rgba(255, 255, 255, 0.05);
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
 }
 
-.icon {
-  font-size: 1.25rem;
+.loader {
+  width: 24px;
+  height: 24px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-top: 3px solid $primary;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.defaultIcon {
+  font-size: 1.5rem;
+  color: $primary;
 }
 
 .content {
   flex: 1;
+  min-width: 0;
 }
 
 .title {
-  margin: 0 0 0.25rem;
-  font-size: 0.875rem;
+  margin: 0 0 0.5rem;
+  font-size: 0.9rem;
   font-weight: 500;
-  color: #718096;
+  color: #94a3b8;
+  letter-spacing: 0.5px;
 }
 
 .value {
-  margin: 0 0 0.25rem;
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #2d3748;
+  margin: 0 0 0.5rem;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #f1f5f9;
+  font-family: 'Orbitron', sans-serif;
+  letter-spacing: -0.5px;
+  background: linear-gradient(to right, #e2e8f0, #cbd5e1);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
 }
 
 .change {
-  font-size: 0.875rem;
+  font-size: 0.9rem;
   display: flex;
   align-items: center;
-
+  font-weight: 500;
+  
   &.positive {
-    color: #38a169;
+    color: #4ade80;
   }
-
+  
   &.negative {
-    color: #e53e3e;
+    color: #f87171;
+  }
+  
+  &.neutral {
+    color: #94a3b8;
   }
 }
 
+.changeIcon {
+  margin-right: 0.4rem;
+  font-size: 1.1rem;
+}
+
 .changeText {
-  color: #a0aec0;
-  margin-left: 0.25rem;
+  color: #64748b;
+  margin-left: 0.4rem;
+  font-weight: 400;
+}
+
+@keyframes loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@media (max-width: 768px) {
+  .card {
+    padding: 1.25rem;
+  }
+  
+  .iconContainer {
+    width: 48px;
+    height: 48px;
+    margin-right: 1rem;
+  }
+  
+  .value {
+    font-size: 1.5rem;
+  }
 }
