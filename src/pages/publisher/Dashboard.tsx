@@ -89,8 +89,8 @@ interface TrackingLink {
 interface AuthUser {
   id: string;
   email: string;
-  firstName: string;
-  lastName: string;
+  first_name: string; // Исправлено с firstName
+  last_name: string;  // Исправлено с lastName
   avatar?: string;
   phone?: string; 
 }
@@ -190,8 +190,8 @@ const PublisherDashboard = () => {
       setUser({
         id: String(authContext.user.id),
         email: authContext.user.email,
-        firstName: authContext.user.firstName || '',
-        lastName: authContext.user.lastName || '',
+        first_name: authContext.user.first_name || '', // Исправлено
+        last_name: authContext.user.last_name || '',   // Исправлено
         avatar: authContext.user.avatar,
         phone: authContext.user.phone,
       });
@@ -581,7 +581,8 @@ const PublisherDashboard = () => {
               alt="User" 
               className={styles.avatar}
             />
-            <span>{user?.firstName} {user?.lastName}</span>
+            {/* Исправлено использование имени */}
+            <span>{user?.first_name} {user?.last_name}</span>
             {profileMenuOpen && (
               <div className={styles.profileDropdown}>
                 <div className={styles.profileHeader}>
@@ -591,7 +592,8 @@ const PublisherDashboard = () => {
                     className={styles.avatarLarge}
                   />
                   <div>
-                    <strong>{user?.firstName} {user?.lastName}</strong>
+                    {/* Исправлено использование имени */}
+                    <strong>{user?.first_name} {user?.last_name}</strong>
                     <span>Publisher Account</span>
                   </div>
                 </div>
@@ -795,7 +797,8 @@ const PublisherDashboard = () => {
               </div>
               <div className={styles.modalBody}>
                 <div className={styles.aiMessage}>
-                  <p>Hi {user?.firstName}, I'm your AI Manager. How can I help you today?</p>
+                  {/* Исправлено использование имени */}
+                  <p>Hi {user?.first_name}, I'm your AI Manager. How can I help you today?</p>
                 </div>
                 <div className={styles.aiSuggestions}>
                   <button>
@@ -1177,11 +1180,11 @@ const PublisherDashboard = () => {
                 <div className={styles.formGroup}>
                   <div className={styles.inputField}>
                     <label>First Name</label>
-                    <input type="text" value={user?.firstName || ''} />
+                    <input type="text" value={user?.first_name || ''} /> {/* Исправлено */}
                   </div>
                   <div className={styles.inputField}>
                     <label>Last Name</label>
-                    <input type="text" value={user?.lastName || ''} />
+                    <input type="text" value={user?.last_name || ''} /> {/* Исправлено */}
                   </div>
                   <div className={styles.inputField}>
                     <label>Email</label>

@@ -1,14 +1,17 @@
 // src/types/auth.d.ts
 
 export type UserRole = 'lender' | 'publisher';
-interface User {
+export interface User {
   id: number;
   email: string;
   firstName: string;
   lastName: string;
+  role: UserRole;
   type: 'lender' | 'publisher';
   company?: string;
   website?: string;
+  avatar?: string;
+  phone?: string;
 }
 
 interface RegisterData extends Omit<User, 'id'> {

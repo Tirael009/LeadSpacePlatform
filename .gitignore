@@ -27,6 +27,9 @@ dist-ssr
 .env
 .env.local
 .env.*.local
+.env.development.local
+.env.test.local
+.env.production.local
 
 # Зависимости
 node_modules/

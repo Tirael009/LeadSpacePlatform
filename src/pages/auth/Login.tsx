@@ -22,6 +22,7 @@ const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [userType, setUserType] = useState<'lender' | 'publisher'>(location.state?.userType || 'lender');
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [failedAttempts, setFailedAttempts] = useState(0);
   const [showCaptcha, setShowCaptcha] = useState(false);
@@ -29,6 +30,19 @@ const LoginPage = () => {
   const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
 
   const { login } = useAuth();
+
+  useEffect(() => {
+    // Проверяем state из навигации (после регистрации)
+    if (location.state?.message) {
+      setSuccessMessage(location.state.message);
+      setEmail(location.state.email || '');
+      setUserType(location.state.userType || 'lender');
+      
+      // Очищаем сообщение через 5 секунд
+      const timer = setTimeout(() => setSuccessMessage(''), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [location]);
 
   useEffect(() => {
     if (failedAttempts >= 3) {
@@ -45,7 +59,7 @@ const LoginPage = () => {
     }
 
     setError('');
-    const isAuthenticated = login(email, password);
+    const isAuthenticated = await login(email, password);
 
     if (isAuthenticated) {
       setFailedAttempts(0);
@@ -89,6 +103,12 @@ const LoginPage = () => {
             </p>
           </motion.div>
         </div>
+
+        {successMessage && (
+          <div className={styles.successMessage}>
+            {successMessage}
+          </div>
+        )}
 
         <div className={styles.userTypeToggle}>
           <motion.button

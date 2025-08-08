@@ -26,6 +26,7 @@ import {
 import { FiChevronDown } from 'react-icons/fi';
 import styles from './Register.module.scss';
 import { countries } from '@/utils/countries';
+import { createUser } from '@/api/directus';
 
 const RegisterPage = () => {
   const navigate = useNavigate();
@@ -57,6 +58,7 @@ const RegisterPage = () => {
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [enable2FA, setEnable2FA] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [registerError, setRegisterError] = useState('');
 
   // Опции для селекторов
   const hearAboutOptions = [
@@ -155,26 +157,58 @@ const RegisterPage = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setRegisterError('');
     
-    if (validate()) {
-      const registrationData = {
-        userType,
-        ...formData,
-        verticals,
-        leadTypes,
-        enable2FA
-      };
+    if (!validate()) {
+      setIsSubmitting(false);
+      return;
+    }
+
+    const userData = {
+      email: formData.email,
+      password: formData.password,
+      first_name: formData.firstName,
+      last_name: formData.lastName,
+      role: userType,
+      company: formData.company,
+      website: formData.website,
+      phone: formData.phone,
+      country: formData.country,
+      tax_id: formData.taxId,
+      license_number: formData.licenseNumber,
+      integration_preference: formData.integrationPref,
+      monthly_volume: formData.monthlyVolume,
+      experience: formData.experience,
+      hear_about_us: formData.hearAboutUs,
+      referral_code: formData.referralCode,
+      verticals: verticals.join(', '),
+      lead_types: leadTypes.join(', ')
+    };
+
+    try {
+      await createUser(userData);
       
-      console.log('Registration data:', registrationData);
+      // Перенаправляем на страницу входа с предзаполненным email
+      navigate('/login', {
+        state: {
+          email: formData.email,
+          userType: userType,
+          message: "Registration successful! Please login"
+        }
+      });
+    } catch (error) {
+      console.error('Registration failed:', error);
       
-      setTimeout(() => {
-        setIsSubmitting(false);
-        navigate('/verify-email');
-      }, 1500);
-    } else {
+      let errorMessage = 'Registration failed. Please try again.';
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      
+      setRegisterError(errorMessage);
+    } finally {
       setIsSubmitting(false);
     }
   };
@@ -244,6 +278,8 @@ const RegisterPage = () => {
         </div>
 
         <form onSubmit={handleSubmit} className={styles.registerForm}>
+          {registerError && <div className={styles.errorMessage}>{registerError}</div>}
+
           <div className={styles.twoColumns}>
             <div className={styles.inputGroup}>
               <label htmlFor="firstName" className={styles.inputLabel}>

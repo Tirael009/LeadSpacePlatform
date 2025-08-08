@@ -1060,7 +1060,7 @@ const LenderDashboard = () => {
                 className={styles.avatar}
               />
               <div className={styles.userInfo}>
-                <span className={styles.userName}>{user?.firstName} {user?.lastName}</span>
+                <span className={styles.userName}>{user?.first_name} {user?.last_name}</span>
                 <span className={styles.userRole}>
                   <FiStar size={12} /> Премиум аккаунт
                 </span>
@@ -1076,7 +1076,7 @@ const LenderDashboard = () => {
                     className={styles.avatarLarge}
                   />
                   <div>
-                    <div className={styles.userNameLarge}>{user?.firstName} {user?.lastName}</div>
+                    <div className={styles.userNameLarge}>{user?.first_name} {user?.last_name}</div>
                     <div className={styles.userEmail}>{user?.email}</div>
                     <div className={styles.accountStatus}>
                       <span className={styles.statusBadge}>Premium</span>
